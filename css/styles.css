@@ -882,11 +882,11 @@ body.chat-open .chat-fab .ic-close{display:block}
 /* ===== Glanz: funkelnder Stern am Logo + Gold/Rosé-Schimmer im Footer (reines CSS/Inline-SVG) ===== */
 .logo-wrap{position:relative}
 .spark{position:absolute;top:-6px;right:-5px;width:24px;height:24px;pointer-events:none;z-index:5;transform-origin:50% 50%;
-  filter:drop-shadow(0 0 1.5px rgba(255,255,255,.95)) drop-shadow(0 0 6px rgba(216,27,60,.75));animation:mn-twinkle 2.8s ease-in-out infinite}
+  filter:drop-shadow(0 0 1.5px rgba(255,255,255,.95)) drop-shadow(0 0 6px rgba(214,222,235,.85)) drop-shadow(0 1px 1.5px rgba(70,25,35,.35));animation:mn-twinkle 2.8s ease-in-out infinite}
 @media (min-width:901px){.spark{width:30px;height:30px;top:-8px;right:-6px}}
 @keyframes mn-twinkle{
-  0%,100%{opacity:.88;transform:scale(.86) rotate(0deg);filter:drop-shadow(0 0 1.5px rgba(255,255,255,.9)) drop-shadow(0 0 4px rgba(216,27,60,.5))}
-  45%{opacity:1;transform:scale(1.16) rotate(20deg);filter:drop-shadow(0 0 2.5px rgba(255,255,255,1)) drop-shadow(0 0 11px rgba(255,60,90,.95))}
+  0%,100%{opacity:.88;transform:scale(.86) rotate(0deg);filter:drop-shadow(0 0 1.5px rgba(255,255,255,.9)) drop-shadow(0 0 4px rgba(214,222,235,.6)) drop-shadow(0 1px 1.5px rgba(70,25,35,.35))}
+  45%{opacity:1;transform:scale(1.16) rotate(20deg);filter:drop-shadow(0 0 2.5px rgba(255,255,255,1)) drop-shadow(0 0 11px rgba(232,238,248,1)) drop-shadow(0 1px 1.5px rgba(70,25,35,.35))}
   60%{opacity:1;transform:scale(1) rotate(28deg)}}
 /* Footer: goldene Linie + wandernder Lichtpunkt */
 .site-footer{position:relative;overflow:hidden}
