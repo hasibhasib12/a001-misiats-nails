@@ -105,7 +105,7 @@
     function kshow(i) {
       i = (i + km.length) % km.length; if (i === kc) return;
       km[kc].classList.remove("on"); kt[kc].classList.remove("on"); kt[kc].removeAttribute("aria-current");
-      kc = i; km[kc].classList.add("on"); kt[kc].classList.add("on"); kt[kc].setAttribute("aria-current", "true");
+      kc = i; kstage.style.setProperty("--arn", km[kc].getAttribute("data-ar") || "1"); km[kc].classList.add("on"); kt[kc].classList.add("on"); kt[kc].setAttribute("aria-current", "true");
       var im = $("img", km[kc]); if (im.loading === "lazy") im.loading = "eager";
       var nx = $("img", km[(kc + 1) % km.length]); if (nx.loading === "lazy") nx.loading = "eager";
       $(".kc-no", kw).textContent = kpad(kc); $(".kc-cap", kw).textContent = KD[kc][0]; $(".kc-alt", kw).textContent = KD[kc][1]; $(".kc-count b", kw).textContent = kpad(kc);
