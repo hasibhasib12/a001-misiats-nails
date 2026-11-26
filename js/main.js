@@ -55,10 +55,13 @@
   function svgEl(d) { var n = document.createElementNS("http://www.w3.org/2000/svg", "svg"); n.setAttribute("viewBox", "0 0 24 24"); n.setAttribute("aria-hidden", "true"); n.innerHTML = d; return n; }
   var IC_EUR = '<path d="M15.5 7.2A5.5 5.5 0 0 0 7.6 10M7.6 14a5.5 5.5 0 0 0 7.9 2.8M5.5 10.6h7M5.5 13.4h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>';
   var IC_PIN = '<path d="M12 20.5s-6-5.6-6-10.2a6 6 0 0 1 12 0c0 4.6-6 10.2-6 10.2z" fill="currentColor"/><circle cx="12" cy="10.2" r="2.3" fill="#fff"/>';
-  $$("[data-pedcards]").forEach(function (wrap) {
-    var loc = wrap.getAttribute("data-pedcards"), L = D.locations[loc], tx = PC[LANG];
-    L.services.pedikuere.forEach(function (s) {
-      if (!s.photo || !s.card) return;
+  $$("[data-cards]").forEach(function (wrap) {
+    var pp = wrap.getAttribute("data-cards").split("."), loc = pp[0], svc = pp[1], L = D.locations[loc], tx = PC[LANG];
+    L.services[svc].forEach(function (s) {
+      if (!s.photo || !s.card) {   /* ohne Foto (z. B. Herren-Pediküre): schlichte Karte mit Platzhalter, nur wo erlaubt */
+        if (wrap.hasAttribute("data-fallback")) { var fa = el("article", "svc-item pc-fallback"); fa.appendChild(photoEl(s)); var fr = el("div", "row"); fr.appendChild(el("h4", "", sname(s))); var fp = priceText(s); fr.appendChild(el("b", fp.tbc ? "tbc" : "", fp.t)); fa.appendChild(fr); wrap.appendChild(fa); }
+        return;
+      }
       var c = s.card, a = el("article", "pcard"); a.style.setProperty("--pc-bg", c.bg); a.style.setProperty("--pc-ac", c.ac);
       a.setAttribute("aria-label", sname(s) + " – " + L.name);
       var f = el("figure", "pc-photo"), im = document.createElement("img");
@@ -76,7 +79,7 @@
       var p2 = el("p", "pill"), b2 = el("span", "badge"); b2.appendChild(svgEl(IC_PIN)); p2.appendChild(b2);
       var x2 = el("span", "pl"); x2.appendChild(el("small", "", tx.loc)); x2.appendChild(el("b", "", L.name)); p2.appendChild(x2); pills.appendChild(p2);
       t.appendChild(pills);
-      var cta = el("a", "pc-cta", tx.cta); cta.href = "kontakt.html?loc=" + loc + "&svc=pedikuere"; cta.setAttribute("data-chat", loc + ":pedikuere");
+      var cta = el("a", "pc-cta", tx.cta); cta.href = "kontakt.html?loc=" + loc + "&svc=" + svc; cta.setAttribute("data-chat", loc + ":" + svc);
       t.appendChild(cta); a.appendChild(t); wrap.appendChild(a);
     });
   });
@@ -139,10 +142,18 @@
       kc = i; kstage.style.setProperty("--arn", km[kc].getAttribute("data-ar") || "1"); km[kc].classList.add("on"); kt[kc].classList.add("on"); kt[kc].setAttribute("aria-current", "true");
       var im = $("img", km[kc]); if (im.loading === "lazy") im.loading = "eager";
       var nx = $("img", km[(kc + 1) % km.length]); if (nx.loading === "lazy") nx.loading = "eager";
-      $(".kc-no", kw).textContent = kpad(kc); $(".kc-cap", kw).textContent = KD[kc][0]; $(".kc-alt", kw).textContent = KD[kc][1]; $(".kc-count b", kw).textContent = kpad(kc);
+      var it = KD[kc], kcard = $(".kc-card", kw);
+      $(".kc-side", kw).textContent = it[0]; $(".kc-alt", kw).textContent = it[1]; $(".kc-cap", kw).textContent = it[2]; $(".kc-s", kw).textContent = it[3];
+      kcard.style.setProperty("--pc-bg", it[4]); kcard.style.setProperty("--pc-ac", it[5]);
+      $(".kc-loc", kw).textContent = it[6] === "L" ? kw.getAttribute("data-locl") : kw.getAttribute("data-locp");
+      $(".kc-cta", kw).href = "kontakt.html" + (it[6] === "L" ? "?loc=langerfeld&svc=manikuere" : "?svc=pedikuere");
+      $(".kc-count b", kw).textContent = kpad(kc);
       var st = $(".kc-strip", kw), t = kt[kc]; st.scrollTo({ left: t.offsetLeft - (st.clientWidth - t.offsetWidth) / 2, behavior: kreduce ? "auto" : "smooth" });
     }
     kt.forEach(function (b, i) { b.addEventListener("click", function () { kshow(i); }); });
+    $(".kc-cta", kw).addEventListener("click", function (e) {   /* Chat: Maniküre → Langerfeld vorbelegt, Pediküre → Standortwahl */
+      if (!window.MNopenChat) return; e.preventDefault(); window.MNopenChat(KD[kc][6] === "L" ? ["langerfeld", "manikuere"] : null);
+    });
     $(".kc-next", kw).addEventListener("click", function () { kshow(kc + 1); });
     $(".kc-prev", kw).addEventListener("click", function () { kshow(kc - 1); });
     var kx = null, kdx = 0, kmoved = false;
@@ -302,6 +313,7 @@
     function openChat(preset) { body.classList.add("chat-open"); fab.setAttribute("aria-expanded", "true"); if (preset || !st) start(preset); }
     function closeChat() { body.classList.remove("chat-open"); fab.setAttribute("aria-expanded", "false"); fab.focus(); }
     window.MNcloseChat = closeChat;
+    window.MNopenChat = openChat;
     fab.addEventListener("click", function () { body.classList.contains("chat-open") ? closeChat() : openChat(); });
     $(".chat-head .x", panel).addEventListener("click", closeChat);
     restartBtn.addEventListener("click", function () { start(); });

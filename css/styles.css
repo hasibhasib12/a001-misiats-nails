@@ -847,10 +847,10 @@ body.chat-open .chat-fab .ic-close{display:block}
 .tz-i{display:block;text-decoration:none;color:var(--text)}
 .tz-i img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:22px;display:block;background:#F1ECE6;transition:transform .5s}
 .tz-i:hover img{transform:translateY(-4px)}
-.tz-i span{display:block;margin-top:12px;font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--burgundy)}
+.tz-i > span:not(.tz-card){display:block;margin-top:12px;font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--burgundy)}
 .tz-btn{margin-top:40px}
 @media (max-width:900px){.tz-grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:640px){.teaser{width:calc(100% - 40px);padding:10px 0 90px}.tz-grid{gap:12px}.tz-i img{border-radius:16px}.tz-i span{font-size:18px;margin-top:8px}.tz-lead{font-size:19px}}
+@media (max-width:640px){.teaser{width:calc(100% - 40px);padding:10px 0 90px}.tz-grid{gap:12px}.tz-i img{border-radius:16px}.tz-i > span:not(.tz-card){font-size:18px;margin-top:8px}.tz-lead{font-size:19px}}
 /* ===== 404 ===== */
 .nf{min-height:60vh;padding-bottom:120px}
 .nf-en{margin-top:10px;color:var(--secondary);font-size:16px}
@@ -984,3 +984,32 @@ body.chat-open .chat-fab .ic-close{display:block}
 /* Leistungen: Fotos im Originalformat */
 .svc-item .ph-img.nat{aspect-ratio:auto}.svc-item .ph-img.nat img{height:auto}
 .svc-list{align-items:start}
+/* Leistungen: Karten in der Spalte + schlichte Platzhalter-Karte */
+.pcards.lv{width:auto;margin:0 0 34px}
+.pc-fallback{align-self:start}
+/* ===== Galerie: Textkarte im Instagram-Stil neben/unter dem Foto ===== */
+.kc-card{position:relative;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--pc-bg);color:#FAF3EA;border-radius:30px;padding:64px 34px 34px;overflow:hidden;transition:background-color .6s ease;box-shadow:0 30px 60px -34px rgba(30,10,15,.55)}
+.kc-card .pc-side{top:20px;right:24px}
+.kc-card .pc-h.kc-cap{font-size:34px;margin:6px 0 0;font-weight:400;color:#FAF3EA}
+.kc-card .pc-s.kc-s{font-size:64px;transition:color .6s}
+.kc-card .pc-ul{transition:background-color .6s}
+.kc-card .kc-pill{width:min(100%,340px);text-align:left}
+.kc-card .pc-cta{margin-top:18px}
+.kc-card .kc-nav{margin-top:26px;justify-content:center}
+.kc-card .kc-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);color:#FAF3EA}
+.kc-card .kc-btn:hover{background:var(--pc-ac);color:#1C1614}
+.kc-card .kc-count{color:rgba(250,243,234,.7)}.kc-card .kc-count b{color:#FAF3EA}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:0}
+@media (max-width:900px){.kc{gap:0}.kc-stage{border-radius:24px 24px 0 0;box-shadow:none}.kc-card{border-radius:0 0 24px 24px;padding:52px 22px 26px}}
+@media (max-width:640px){.kc-card .pc-h.kc-cap{font-size:26px}.kc-card .pc-s.kc-s{font-size:50px;margin:0}.kc-card .pc-side{font-size:23px;top:14px;right:16px}.kc-card .kc-nav .kc-btn{display:inline-flex;width:44px;height:44px}}
+@media (prefers-reduced-motion:reduce){.kc-card,.kc-card .pc-s,.kc-card .pc-ul{transition:none}}
+/* Startseite: Galerie-Teaser mit Karte unter dem Foto */
+.tz-i{border-radius:22px;overflow:hidden;background:var(--pc-bg,#2A1F1C);box-shadow:0 20px 40px -28px rgba(30,10,15,.5)}
+.tz-i img{border-radius:0!important}
+.tz-i:hover img{transform:none}
+.tz-card{display:block;margin:0!important;padding:16px 12px 16px;text-align:center;background:var(--pc-bg);color:#FAF3EA;font-family:inherit!important}
+.tz-card .pc-h{display:block;margin:0;font-size:15px;letter-spacing:.26em;text-indent:.26em}
+.tz-card .pc-s{display:block;margin:0;font-size:32px;line-height:1.15}
+.tz-card .pc-ul{width:40%;height:6px;margin:2px auto 10px}
+.tz-loc{display:inline-block;margin:0!important;padding:5px 10px;border-radius:999px;background:rgba(10,8,8,.45);border:1px solid rgba(255,255,255,.16);font-family:"Josefin Sans",sans-serif!important;font-size:10px!important;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,243,234,.85)!important;line-height:1.4}
+@media (max-width:640px){.tz-i{border-radius:16px}.tz-card{padding:12px 8px 12px}.tz-card .pc-h{font-size:12px;letter-spacing:.2em}.tz-card .pc-s{font-size:26px}.tz-loc{font-size:8.5px!important;padding:4px 7px}}

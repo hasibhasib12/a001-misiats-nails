@@ -23,11 +23,16 @@ window.MN = {
       hours: { de: "Mo–Sa 10:00–20:00, So geschlossen", en: "Mon–Sat 10:00–20:00, Sun closed" },
       services: {
         manikuere: [
-          { id: "mani",        name: "Maniküre", en: "Manicure",                  price: 30, photo: "langerfeld-17-blur", alt: "Gepflegte Hände mit rosa Nägeln", alt_en: "Well-groomed hands with pink nails" },
-          { id: "mani-lack",   name: "Maniküre mit Nagellack", en: "Manicure with nail polish",    price: 35, photo: "g-crystal-s",        alt: "Hand mit pinkem Nagellack am Kristallglas", alt_en: "Hand with pink nail polish holding a crystal glass" },
-          { id: "mani-gel",    name: "Maniküre mit Gel-Lack", en: "Manicure with gel polish",     price: 45, photo: "g-sage-s",           alt: "Nägel mit salbeigrünem Gel-Lack", alt_en: "Nails with sage green gel polish" },
-          { id: "french",      name: "French", en: "French",                    price: 5, prefix: "+", photo: "g-french-s", alt: "Klassische French-Maniküre", alt_en: "Classic French manicure" },
-          { id: "design",      name: "Nageldesign", en: "Nail design",               price: 1, from: true, photo: "hero-signature", alt: "Nude-Nägel mit feinem Blattdesign", alt_en: "Nude nails with a delicate leaf design" }
+          { id: "mani", name: "Maniküre", en: "Manicure", price: 30, photo: "own-nude-gloss", dim: [720, 900], alt: "Glänzende Nude-Mandelnägel", alt_en: "Glossy nude almond nails",
+            card: { bg: "#2A1A20", ac: "#E3BCA6", h: { de: "NATÜRLICH", en: "NATURAL" }, s: { de: "Nude", en: "Nude" }, side: { de: "Gepflegte Hände", en: "Well-groomed hands" } } },
+          { id: "mani-lack", name: "Maniküre mit Nagellack", en: "Manicure with nail polish", price: 35, photo: "own-white-lines", dim: [720, 458], alt: "Weiße Mandelnägel und Nude mit feinen weißen Linien", alt_en: "White almond nails and nude nails with fine white lines",
+            card: { bg: "#3A2626", ac: "#F6C4B1", h: { de: "ELEGANT", en: "ELEGANT" }, s: { de: "Linien", en: "Lines" }, side: { de: "Fein & klar", en: "Fine & clear" } } },
+          { id: "mani-gel", name: "Maniküre mit Gel-Lack", en: "Manicure with gel polish", price: 45, photo: "red-matte-mandel", dim: [720, 720], alt: "Matte rote Mandelnägel mit Nail-Art", alt_en: "Matte red almond nails with nail art",
+            card: { bg: "#2C1D1B", ac: "#F55361", h: { de: "INTENSIV", en: "INTENSE" }, s: { de: "Rot", en: "Red" }, side: { de: "Gel-Lack mit langem Halt", en: "Gel polish that lasts" } } },
+          { id: "french", name: "French", en: "French", price: 5, prefix: "+", photo: "g-french-s", dim: [720, 720], alt: "Klassische French-Maniküre", alt_en: "Classic French manicure",
+            card: { bg: "#1E1413", ac: "#EDE3DC", h: { de: "KLASSISCH", en: "CLASSIC" }, s: { de: "French", en: "French" }, side: { de: "Zeitlos schön", en: "Timeless beauty" } } },
+          { id: "design", name: "Nageldesign", en: "Nail design", price: 1, from: true, photo: "own-banana", dim: [720, 719], alt: "Matte gelbe und hellblaue Nägel mit Bananen-Nail-Art", alt_en: "Matte yellow and light blue nails with banana nail art",
+            card: { bg: "#2A1F1C", ac: "#E9C84A", h: { de: "VERSPIELT", en: "PLAYFUL" }, s: { de: "Design", en: "Design" }, side: { de: "Kleine Kunstwerke", en: "Little works of art" } } }
         ],
         pedikuere: [
           { id: "pedi", name: "Pediküre", en: "Pedicure", price: 35, photo: "ped-red-reel", dim: [720, 875], alt: "Gepflegte Füße mit rotem Nagellack und kleinem Design", alt_en: "Well-groomed feet with red polish and a small design",
