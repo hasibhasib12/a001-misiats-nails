@@ -1,14 +1,14 @@
 /* ================================================================
    Misiats Nails – ALLE PREISE & KONTAKTDATEN AN EINER STELLE
-   !!! Preise sind PLATZHALTER aus der alten Preisliste und müssen
-   vor dem Livegang von der Inhaberin bestätigt werden. !!!
+   Preise = gedruckte Preisliste (Misiats-Nails-Preisliste-A5.pdf,
+   Langerfeld + Schwelm), von der Inhaberin bestätigt am 26.11.2026 20:27.
    name/en, alt/alt_en: deutscher / englischer Text
    price: Zahl in € (null = "Preis folgt"), from: true = "ab"
    prefix "+": Aufpreis (z. B. French +5 €)
    photo: Dateiname in /photos ohne Endung (null = Platzhalter)
    ================================================================ */
 window.MN = {
-  pricesConfirmed: false,
+  pricesConfirmed: true,
   whatsapp: "491726127991",
   /* Wunschuhrzeit-Auswahl (Chat + Formular). Öffnungszeiten bestätigt 26.11.2026:
      Mo–Sa 10:00–20:00, So geschlossen (beide Standorte). Hier anpassen: erste/letzte Uhrzeit, Abstand in Minuten, geschlossene Wochentage
@@ -42,12 +42,12 @@ window.MN = {
       map: "https://www.google.com/maps/search/?api=1&query=Wilhelmstra%C3%9Fe+11%2C+58332+Schwelm",
       hours: { de: "Mo–Sa 10:00–20:00, So geschlossen", en: "Mon–Sat 10:00–20:00, Sun closed" },
       services: {
-        /* Schwelm: NUR Pediküre – Preise noch offen */
+        /* Schwelm: NUR Pediküre – Preise laut Druck-Preisliste Schwelm */
         pedikuere: [
-          { id: "s-pedi",      name: "Pediküre", en: "Pedicure",                  price: null, photo: "schwelm-signature", alt: "Gepflegte Füße mit weißem Nagellack", alt_en: "Well-groomed feet with white nail polish" },
-          { id: "s-pedi-lack", name: "Pediküre mit Nagellack", en: "Pedicure with nail polish",    price: null, photo: null },
-          { id: "s-pedi-gel",  name: "Pediküre mit Gel-Lack", en: "Pedicure with gel polish",     price: null, photo: null },
-          { id: "s-herren",    name: "Herren-Pediküre", en: "Men’s pedicure",           price: null, photo: null }
+          { id: "s-pedi",      name: "Pediküre", en: "Pedicure",                  price: 35, photo: "schwelm-signature", alt: "Gepflegte Füße mit weißem Nagellack", alt_en: "Well-groomed feet with white nail polish" },
+          { id: "s-pedi-lack", name: "Pediküre mit Nagellack", en: "Pedicure with nail polish",    price: 40, photo: null },
+          { id: "s-pedi-gel",  name: "Pediküre mit Gel-Lack", en: "Pedicure with gel polish",     price: 45, photo: null },
+          { id: "s-herren",    name: "Herren-Pediküre", en: "Men’s pedicure",           price: 40, photo: null }
         ]
       }
     }
