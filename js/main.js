@@ -80,7 +80,7 @@
   var lb = $(".lb"), lbImg = lb && $("img", lb), lbLast;
   function closeLb() { lb.classList.remove("on"); body.classList.remove("lb-open"); if (lbLast) lbLast.focus(); }
   if (lb) {
-    $$(".mag button, .sl-zoom").forEach(function (b) {
+    $$(".mag button").forEach(function (b) {
       b.addEventListener("click", function () {
         var i = $("img", b); lbLast = b; lbImg.src = b.getAttribute("data-full"); lbImg.alt = i.alt;
         lb.classList.add("on"); body.classList.add("lb-open"); $(".lb-x", lb).focus();
@@ -91,41 +91,36 @@
   }
 
 
-  /* ---------- Galerie-Slider ---------- */
-  var track = $(".sl-track");
-  if (track) {
-    var slides = $$(".sl-slide", track), dotsBox = $(".sl-dots"), prev = $(".sl-prev"), next = $(".sl-next"), countB = $(".sl-count b");
-    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches, cur = 0;
-    var dots = slides.map(function (s, i) {
-      var d = el("button"); d.type = "button"; d.setAttribute("role", "tab"); d.setAttribute("aria-label", "Bild " + (i + 1) + " von " + slides.length);
-      d.addEventListener("click", function () { go(i); }); dotsBox.appendChild(d); return d;
+  /* ---------- Galerie: Magazin-Split ---------- */
+  var kw = $(".kc-wrap");
+  if (kw) {
+    var KD = JSON.parse(kw.getAttribute("data-items")), km = $$(".kc-m", kw), kt = $$(".kc-t", kw), kc = 0;
+    var kreduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches, kstage = $(".kc-stage", kw);
+    function kpad(i) { return (i < 9 ? "0" : "") + (i + 1); }
+    function kshow(i) {
+      i = (i + km.length) % km.length; if (i === kc) return;
+      km[kc].classList.remove("on"); kt[kc].classList.remove("on"); kt[kc].removeAttribute("aria-current");
+      kc = i; km[kc].classList.add("on"); kt[kc].classList.add("on"); kt[kc].setAttribute("aria-current", "true");
+      var im = $("img", km[kc]); if (im.loading === "lazy") im.loading = "eager";
+      var nx = $("img", km[(kc + 1) % km.length]); if (nx.loading === "lazy") nx.loading = "eager";
+      $(".kc-no", kw).textContent = kpad(kc); $(".kc-cap", kw).textContent = KD[kc][0]; $(".kc-alt", kw).textContent = KD[kc][1]; $(".kc-count b", kw).textContent = kpad(kc);
+      var st = $(".kc-strip", kw), t = kt[kc]; st.scrollTo({ left: t.offsetLeft - (st.clientWidth - t.offsetWidth) / 2, behavior: kreduce ? "auto" : "smooth" });
+    }
+    kt.forEach(function (b, i) { b.addEventListener("click", function () { kshow(i); }); });
+    $(".kc-next", kw).addEventListener("click", function () { kshow(kc + 1); });
+    $(".kc-prev", kw).addEventListener("click", function () { kshow(kc - 1); });
+    var kx = null, kdx = 0, kmoved = false;
+    kstage.addEventListener("pointerdown", function (e) { kx = e.clientX; kdx = 0; kmoved = false; if (e.pointerType === "mouse") e.preventDefault(); });
+    kstage.addEventListener("dragstart", function (e) { e.preventDefault(); });
+    kstage.addEventListener("pointermove", function (e) { if (kx !== null) { kdx = e.clientX - kx; if (Math.abs(kdx) > 8) kmoved = true; } });
+    function kup() { if (kx === null) return; kx = null; if (kdx < -45) kshow(kc + 1); else if (kdx > 45) kshow(kc - 1); }
+    kstage.addEventListener("pointerup", kup); kstage.addEventListener("pointercancel", kup);
+    function kopen() { if (!lb) return; lbLast = kstage; lbImg.src = km[kc].getAttribute("data-full"); lbImg.alt = $("img", km[kc]).alt; lb.classList.add("on"); body.classList.add("lb-open"); $(".lb-x", lb).focus(); }
+    kstage.addEventListener("click", function () { if (!kmoved) kopen(); kmoved = false; });
+    kw.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); kshow(kc + 1); } else if (e.key === "ArrowLeft") { e.preventDefault(); kshow(kc - 1); }
+      else if ((e.key === "Enter" || e.key === " ") && e.target === kstage) { e.preventDefault(); kopen(); }
     });
-    function go(i) {
-      i = Math.max(0, Math.min(slides.length - 1, i)); var s = slides[i];
-      track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.offsetWidth) / 2, behavior: reduce ? "auto" : "smooth" });
-    }
-    function mark(i) {
-      cur = i;
-      slides.forEach(function (s, k) { s.classList.toggle("is-active", k === i); });
-      dots.forEach(function (d, k) { d.setAttribute("aria-selected", k === i ? "true" : "false"); });
-      countB.textContent = (i < 9 ? "0" : "") + (i + 1);
-      prev.disabled = i === 0; next.disabled = i === slides.length - 1;
-    }
-    function nearest() {
-      var c = track.scrollLeft + track.clientWidth / 2, best = 0, bd = 1e9;
-      slides.forEach(function (s, k) { var d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - c); if (d < bd) { bd = d; best = k; } });
-      return best;
-    }
-    var raf;
-    track.addEventListener("scroll", function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(function () { var n = nearest(); if (n !== cur) mark(n); }); }, { passive: true });
-    prev.addEventListener("click", function () { go(cur - 1); });
-    next.addEventListener("click", function () { go(cur + 1); });
-    track.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
-      else if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
-    });
-    slides.forEach(function (s, k) { s.addEventListener("click", function (e) { if (k !== cur) { e.preventDefault(); e.stopPropagation(); go(k); } }, true); });
-    mark(0);
   }
 
   /* ---------- WhatsApp-Nachricht (nur im Browser) ---------- */
