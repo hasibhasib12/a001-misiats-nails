@@ -80,7 +80,7 @@
   var lb = $(".lb"), lbImg = lb && $("img", lb), lbLast;
   function closeLb() { lb.classList.remove("on"); body.classList.remove("lb-open"); if (lbLast) lbLast.focus(); }
   if (lb) {
-    $$(".mag button").forEach(function (b) {
+    $$(".mag button, .sl-zoom").forEach(function (b) {
       b.addEventListener("click", function () {
         var i = $("img", b); lbLast = b; lbImg.src = b.getAttribute("data-full"); lbImg.alt = i.alt;
         lb.classList.add("on"); body.classList.add("lb-open"); $(".lb-x", lb).focus();
@@ -88,6 +88,44 @@
     });
     $(".lb-x", lb).addEventListener("click", closeLb);
     lb.addEventListener("click", function (e) { if (e.target === lb) closeLb(); });
+  }
+
+
+  /* ---------- Galerie-Slider ---------- */
+  var track = $(".sl-track");
+  if (track) {
+    var slides = $$(".sl-slide", track), dotsBox = $(".sl-dots"), prev = $(".sl-prev"), next = $(".sl-next"), countB = $(".sl-count b");
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches, cur = 0;
+    var dots = slides.map(function (s, i) {
+      var d = el("button"); d.type = "button"; d.setAttribute("role", "tab"); d.setAttribute("aria-label", "Bild " + (i + 1) + " von " + slides.length);
+      d.addEventListener("click", function () { go(i); }); dotsBox.appendChild(d); return d;
+    });
+    function go(i) {
+      i = Math.max(0, Math.min(slides.length - 1, i)); var s = slides[i];
+      track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.offsetWidth) / 2, behavior: reduce ? "auto" : "smooth" });
+    }
+    function mark(i) {
+      cur = i;
+      slides.forEach(function (s, k) { s.classList.toggle("is-active", k === i); });
+      dots.forEach(function (d, k) { d.setAttribute("aria-selected", k === i ? "true" : "false"); });
+      countB.textContent = (i < 9 ? "0" : "") + (i + 1);
+      prev.disabled = i === 0; next.disabled = i === slides.length - 1;
+    }
+    function nearest() {
+      var c = track.scrollLeft + track.clientWidth / 2, best = 0, bd = 1e9;
+      slides.forEach(function (s, k) { var d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - c); if (d < bd) { bd = d; best = k; } });
+      return best;
+    }
+    var raf;
+    track.addEventListener("scroll", function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(function () { var n = nearest(); if (n !== cur) mark(n); }); }, { passive: true });
+    prev.addEventListener("click", function () { go(cur - 1); });
+    next.addEventListener("click", function () { go(cur + 1); });
+    track.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
+    });
+    slides.forEach(function (s, k) { s.addEventListener("click", function (e) { if (k !== cur) { e.preventDefault(); e.stopPropagation(); go(k); } }, true); });
+    mark(0);
   }
 
   /* ---------- WhatsApp-Nachricht (nur im Browser) ---------- */
