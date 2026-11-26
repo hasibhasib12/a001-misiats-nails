@@ -879,3 +879,15 @@ body.chat-open .chat-fab .ic-close{display:block}
 .ct-note{font-size:12px;color:var(--secondary)}
 .ct-flex{align-self:flex-start;min-height:40px}
 @media (max-width:640px){.seg.slots{grid-template-columns:repeat(4,1fr)}}
+/* ===== Dezenter Glanz: Stern im Header + Schimmer im Footer (reines CSS/SVG) ===== */
+.logo-wrap{position:relative}
+.spark{position:absolute;top:-6px;right:-6px;width:16px;height:16px;pointer-events:none;filter:drop-shadow(0 0 3px rgba(241,215,156,.85));transform-origin:50% 50%;animation:mn-twinkle 4.8s ease-in-out infinite}
+@keyframes mn-twinkle{0%,62%,100%{opacity:.55;transform:scale(.72) rotate(0deg)}74%{opacity:1;transform:scale(1.08) rotate(20deg)}84%{opacity:.8;transform:scale(.9) rotate(32deg)}}
+.foot-bottom{position:relative}
+.foot-bottom::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,rgba(241,215,156,0) 0%,rgba(241,215,156,.85) 42%,rgba(255,214,224,.9) 52%,rgba(241,215,156,0) 100%) no-repeat;
+  background-size:38% 100%;background-position:-60% 0;opacity:.85;height:1.5px;top:-1.5px;animation:mn-sheen 9s ease-in-out infinite}
+.foot-bottom > span{background:linear-gradient(100deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,.6) 40%,rgba(255,236,214,.95) 50%,rgba(255,255,255,.6) 60%,rgba(255,255,255,.6) 100%);background-size:250% 100%;background-position:120% 0;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mn-text 9s ease-in-out infinite}
+@keyframes mn-sheen{0%{background-position:-60% 0}55%,100%{background-position:160% 0}}
+@keyframes mn-text{0%,20%{background-position:120% 0}70%,100%{background-position:-20% 0}}
+@media (prefers-reduced-motion: reduce){.spark,.foot-bottom::before,.foot-bottom > span{animation:none}.spark{opacity:.9;transform:none}.foot-bottom::before{background-position:50% 0;opacity:.45}.foot-bottom > span{background:none;color:rgba(255,255,255,.6)}}
