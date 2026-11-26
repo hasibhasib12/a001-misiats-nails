@@ -139,7 +139,7 @@
           done: "Danke, {n}! Ihre Anfrage ist vorbereitet. Tippen Sie unten, um sie per WhatsApp zu senden. Ihr Termin wird persönlich per WhatsApp bestätigt.",
           wa: "Termin per WhatsApp anfragen", note: "Ihr Termin wird persönlich per WhatsApp bestätigt. Es wird nichts gespeichert – bitte keine Gesundheitsdaten angeben.",
           restart: "Neu beginnen", sub: "Assistent · Terminanfrage", mani: "Maniküre", pedi: "Pediküre",
-          slots: ["Vormittag", "Mittag", "Nachmittag", "Abend"], pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit",
+          slots: ["Vormittag", "Mittag", "Nachmittag", "Abend"], pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit", wDate: "Wunschdatum", wTime: "Tageszeit",
           choose: "Bitte wählen", first: "Erst Standort und Leistung wählen", fill: "Bitte alle Felder ausfüllen.", sOnly: "In Schwelm nur Pediküre.",
           msg: ["Hallo Misiats Nails, ich möchte gern einen Termin anfragen.", "Standort", "Behandlung", "Wunschtermin", "Name", "flexibel", "Bitte bestätigen Sie mir den Termin per WhatsApp. Danke!"] },
     en: { hi: "Hello! I’ll help you prepare your appointment request for WhatsApp.", loc: "Which location would you like to visit?", schwelmOnly: "Our Schwelm studio offers pedicures only.",
@@ -148,7 +148,7 @@
           done: "Thank you, {n}! Your request is ready. Tap below to send it via WhatsApp. Your appointment will be confirmed personally via WhatsApp.",
           wa: "Request appointment via WhatsApp", note: "Your appointment is confirmed personally via WhatsApp. Nothing is stored – please do not share health information.",
           restart: "Start again", sub: "Assistant · Appointment request", mani: "Manicure", pedi: "Pedicure",
-          slots: ["Morning", "Midday", "Afternoon", "Evening"], pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day",
+          slots: ["Morning", "Midday", "Afternoon", "Evening"], pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day", wDate: "Preferred date", wTime: "Time of day",
           choose: "Please choose", first: "Choose location and service first", fill: "Please fill in all fields.", sOnly: "Pedicure only in Schwelm.",
           msg: ["Hello Misiats Nails, I would like to request an appointment.", "Location", "Treatment", "Preferred date", "Name", "flexible", "Please confirm the appointment via WhatsApp. Thank you!"] }
   };
@@ -157,7 +157,8 @@
     var t = T[d.lang || "de"], L = D.locations[d.loc];
     var lg = d.lang || "de", svcName = (d.svc === "manikuere" ? t.mani : t.pedi), sv = findSvc(d.loc, d.svc, d.treat), tn = sv ? sname(sv, lg) : d.treat;
     var when = d.flex ? t.msg[5] : [fmtDate(d.date), d.slot].filter(Boolean).join(", ");
-    var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + (tn.toLowerCase().indexOf(svcName.toLowerCase()) >= 0 ? tn : svcName + " – " + tn), t.msg[3] + ": " + when, t.msg[4] + ": " + d.name, "", t.msg[6]].join("\n");
+    var whenLines = d.flex ? [t.msg[3] + ": " + t.msg[5]] : [t.wDate + ": " + fmtDate(d.date), t.wTime + ": " + (d.slot || "–")];
+    var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + (tn.toLowerCase().indexOf(svcName.toLowerCase()) >= 0 ? tn : svcName + " – " + tn)].concat(whenLines, [t.msg[4] + ": " + d.name, "", t.msg[6]]).join("\n");
     return "https://wa.me/" + D.whatsapp + "?text=" + encodeURIComponent(m);
   }
   window.MNbuildWa = buildWa;
@@ -286,6 +287,7 @@
       if (pr) { fwa.href = "https://wa.me/" + D.whatsapp; fwa.removeAttribute("target"); fwa.setAttribute("data-ready", "0"); ffb.hidden = true; form.removeAttribute("data-wa"); return null; }
       var url = buildWa(d); linkWa(fwa, url); fwa.setAttribute("data-ready", "1"); form.setAttribute("data-wa", url); err.textContent = ""; fallback(ffb, url); return url;
     }
+    $("#f-slot", form).addEventListener("change", refresh);
     ["input", "change"].forEach(function (ev) { form.addEventListener(ev, function () { setTimeout(refresh, 0); }); });
     form.addEventListener("change", function (e) { if (e.target.name === "loc" || e.target.name === "svc") refresh(); });
     fwa.addEventListener("click", function (e) {
