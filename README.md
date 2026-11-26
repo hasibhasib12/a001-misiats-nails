@@ -30,6 +30,9 @@ Fotos liegen in `photos/` als JPG (Original) plus `-720.webp` und `-1440.webp`.
 Neues Foto: JPG ablegen, WebP-Versionen in 720 px und 1440 px Breite erzeugen, Dateinamen (ohne Endung)
 in `js/prices.js` bei `photo:` eintragen. `photo: null` zeigt `photos/platzhalter-foto-folgt.svg`.
 
+## Bildnachweis
+Startseiten-Hero: Foto von Valeria Boltneva, Pexels (https://www.pexels.com/photo/hand-holding-flowers-12982840/), Pexels License. Stockfoto, keine eigene Arbeit des Studios. Das alte Hero-Foto (`photos/hero-signature*`) liegt weiterhin im Ordner.
+
 ## Chat-Assistent & Buchungsformular
 Geführte Fragen: Sprache (DE/EN/UA) → Standort → Leistung (Schwelm: nur Pediküre) → Behandlung →
 Wunschtermin → Vorname. Danach öffnet sich `https://wa.me/<Nummer>?text=…` mit vorbereiteter Nachricht.
