@@ -805,11 +805,11 @@ body.chat-open .chat-fab .ic-close{display:block}
 
 /* ===== Homepage hero: eigene Arbeit – matte rote Mandelnägel mit Nail-Art (own-red-v2, Einwilligung bestätigt 26.11.2026 17:19) =====
    Spare (not used): hero-daisy-* = Pexels #12982840 (Valeria Boltneva), stock photo, not salon work */
-.hero-photo{background:url(../photos/hero-red-matte-desktop-1440.webp) 70% 50%/cover no-repeat}
-@media (min-width:1500px),(min-resolution:1.5dppx) and (min-width:641px){.hero-photo{background-image:url(../photos/hero-red-matte-desktop-2400.webp)}}
+.hero-photo{background:url(../photos/hero-red-matte-desktop-1440.webp?v=sr1) 70% 50%/cover no-repeat}
+@media (min-width:1500px),(min-resolution:1.5dppx) and (min-width:641px){.hero-photo{background-image:url(../photos/hero-red-matte-desktop-2400.webp?v=sr1)}}
 .hero-photo::after{background:linear-gradient(90deg,rgba(250,247,242,.9) 0%,rgba(250,247,242,.7) 32%,rgba(250,247,242,.12) 56%,rgba(250,247,242,0) 100%),linear-gradient(0deg,rgba(250,247,242,.45) 0%,rgba(250,247,242,0) 26%)}
 @media (max-width:640px){
- .hero-photo{background:url(../photos/hero-red-matte-mobile-1000.webp) 50% 0%/cover no-repeat}
+ .hero-photo{background:url(../photos/hero-red-matte-mobile-1000.webp?v=sr1) 50% 0%/cover no-repeat}
  .hero-photo::after{background:linear-gradient(0deg,rgba(250,247,242,.94) 0%,rgba(250,247,242,.82) 32%,rgba(250,247,242,.2) 50%,rgba(250,247,242,0) 62%)}
 }
 
