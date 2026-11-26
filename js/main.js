@@ -266,6 +266,7 @@
     function openChat(preset) { body.classList.add("chat-open"); fab.setAttribute("aria-expanded", "true"); if (preset || !st) start(preset); }
     function closeChat() { body.classList.remove("chat-open"); fab.setAttribute("aria-expanded", "false"); fab.focus(); }
     window.MNcloseChat = closeChat;
+    window.MNopenChat = openChat; window.MNchatOpen = function () { return body.classList.contains("chat-open"); };
     fab.addEventListener("click", function () { body.classList.contains("chat-open") ? closeChat() : openChat(); });
     $(".chat-head .x", panel).addEventListener("click", closeChat);
     restartBtn.addEventListener("click", function () { start(); });
@@ -325,5 +326,18 @@
       if (DESK) window.open(url, "_blank", "noopener"); else location.href = url;
     });
     refresh();
+  }
+
+  /* ---------- Mobile Schnellaktionsleiste ---------- */
+  var bbar = $(".bbar");
+  if (bbar) {
+    var bChat = $(".bb-chat", bbar), bRoute = $(".bb-route", bbar), bPop = $(".bb-pop", bbar);
+    function popClose() { bPop.hidden = true; bRoute.setAttribute("aria-expanded", "false"); }
+    bChat.addEventListener("click", function (e) { e.stopPropagation(); popClose();
+      if (window.MNchatOpen && window.MNchatOpen()) { if (window.MNcloseChat) window.MNcloseChat(); } else if (window.MNopenChat) window.MNopenChat(); });
+    bRoute.addEventListener("click", function (e) { e.stopPropagation(); var o = bPop.hidden; bPop.hidden = !o; bRoute.setAttribute("aria-expanded", String(o)); if (o && window.MNcloseChat && window.MNchatOpen && window.MNchatOpen()) window.MNcloseChat(); });
+    bPop.addEventListener("click", function (e) { e.stopPropagation(); });
+    document.addEventListener("click", popClose);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") popClose(); });
   }
 })();
