@@ -2,6 +2,7 @@
    Misiats Nails – ALLE PREISE & KONTAKTDATEN AN EINER STELLE
    !!! Preise sind PLATZHALTER aus der alten Preisliste und müssen
    vor dem Livegang von der Inhaberin bestätigt werden. !!!
+   name/en, alt/alt_en: deutscher / englischer Text
    price: Zahl in € (null = "Preis folgt"), from: true = "ab"
    prefix "+": Aufpreis (z. B. French +5 €)
    photo: Dateiname in /photos ohne Endung (null = Platzhalter)
@@ -17,17 +18,17 @@ window.MN = {
       hours: null,                     // null = "Öffnungszeiten werden noch bestätigt"
       services: {
         manikuere: [
-          { id: "mani",        name: "Maniküre",                  price: 30, photo: "langerfeld-17-blur", alt: "Gepflegte Hände mit rosa Nägeln" },
-          { id: "mani-lack",   name: "Maniküre mit Nagellack",    price: 35, photo: "g-crystal-s",        alt: "Hand mit pinkem Nagellack am Kristallglas" },
-          { id: "mani-gel",    name: "Maniküre mit Gel-Lack",     price: 45, photo: "g-sage-s",           alt: "Nägel mit salbeigrünem Gel-Lack" },
-          { id: "french",      name: "French",                    price: 5, prefix: "+", photo: "g-french-s", alt: "Klassische French-Maniküre" },
-          { id: "design",      name: "Nageldesign",               price: 1, from: true, photo: "hero-signature", alt: "Nude-Nägel mit feinem Blattdesign" }
+          { id: "mani",        name: "Maniküre", en: "Manicure",                  price: 30, photo: "langerfeld-17-blur", alt: "Gepflegte Hände mit rosa Nägeln", alt_en: "Well-groomed hands with pink nails" },
+          { id: "mani-lack",   name: "Maniküre mit Nagellack", en: "Manicure with nail polish",    price: 35, photo: "g-crystal-s",        alt: "Hand mit pinkem Nagellack am Kristallglas", alt_en: "Hand with pink nail polish holding a crystal glass" },
+          { id: "mani-gel",    name: "Maniküre mit Gel-Lack", en: "Manicure with gel polish",     price: 45, photo: "g-sage-s",           alt: "Nägel mit salbeigrünem Gel-Lack", alt_en: "Nails with sage green gel polish" },
+          { id: "french",      name: "French", en: "French",                    price: 5, prefix: "+", photo: "g-french-s", alt: "Klassische French-Maniküre", alt_en: "Classic French manicure" },
+          { id: "design",      name: "Nageldesign", en: "Nail design",               price: 1, from: true, photo: "hero-signature", alt: "Nude-Nägel mit feinem Blattdesign", alt_en: "Nude nails with a delicate leaf design" }
         ],
         pedikuere: [
-          { id: "pedi",        name: "Pediküre",                  price: 35, photo: "g-ped12-s", alt: "Gepflegte Füße mit weißem Nagellack" },
-          { id: "pedi-lack",   name: "Pediküre mit Nagellack",    price: 40, photo: null },
-          { id: "pedi-gel",    name: "Pediküre mit Gel-Lack",     price: 45, photo: null },
-          { id: "herren",      name: "Herren-Pediküre",           price: 40, photo: null }
+          { id: "pedi",        name: "Pediküre", en: "Pedicure",                  price: 35, photo: "g-ped12-s", alt: "Gepflegte Füße mit weißem Nagellack", alt_en: "Well-groomed feet with white nail polish" },
+          { id: "pedi-lack",   name: "Pediküre mit Nagellack", en: "Pedicure with nail polish",    price: 40, photo: null },
+          { id: "pedi-gel",    name: "Pediküre mit Gel-Lack", en: "Pedicure with gel polish",     price: 45, photo: null },
+          { id: "herren",      name: "Herren-Pediküre", en: "Men’s pedicure",           price: 40, photo: null }
         ]
       }
     },
@@ -39,10 +40,10 @@ window.MN = {
       services: {
         /* Schwelm: NUR Pediküre – Preise noch offen */
         pedikuere: [
-          { id: "s-pedi",      name: "Pediküre",                  price: null, photo: "schwelm-signature", alt: "Gepflegte Füße mit weißem Nagellack" },
-          { id: "s-pedi-lack", name: "Pediküre mit Nagellack",    price: null, photo: null },
-          { id: "s-pedi-gel",  name: "Pediküre mit Gel-Lack",     price: null, photo: null },
-          { id: "s-herren",    name: "Herren-Pediküre",           price: null, photo: null }
+          { id: "s-pedi",      name: "Pediküre", en: "Pedicure",                  price: null, photo: "schwelm-signature", alt: "Gepflegte Füße mit weißem Nagellack", alt_en: "Well-groomed feet with white nail polish" },
+          { id: "s-pedi-lack", name: "Pediküre mit Nagellack", en: "Pedicure with nail polish",    price: null, photo: null },
+          { id: "s-pedi-gel",  name: "Pediküre mit Gel-Lack", en: "Pedicure with gel polish",     price: null, photo: null },
+          { id: "s-herren",    name: "Herren-Pediküre", en: "Men’s pedicure",           price: null, photo: null }
         ]
       }
     }

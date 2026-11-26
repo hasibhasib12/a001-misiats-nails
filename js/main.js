@@ -7,11 +7,16 @@
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   var params = new URLSearchParams(location.search);
   var base = body.getAttribute("data-base") || "";
+  var LANG = document.documentElement.lang === "en" ? "en" : "de";
+  function sname(s, lg) { return ((lg || LANG) === "en" && s.en) || s.name; }
+  function salt(s) { return (LANG === "en" && s.alt_en) || s.alt || sname(s); }
+  function findSvc(loc, svc, id) { var r = null; D.locations[loc].services[svc].forEach(function (s) { if (s.id === id) r = s; }); return r; }
 
   /* ---------- Preise ---------- */
   function priceText(s, lang) {
-    if (s.price == null) return { t: ({ de: "Preis folgt", en: "price tbc", uk: "ціна уточнюється" })[lang || "de"], tbc: true };
-    return { t: (s.prefix || "") + (s.from ? (lang === "en" ? "from " : lang === "uk" ? "від " : "ab ") : "") + s.price + " €", tbc: false };
+    lang = lang || LANG;
+    if (s.price == null) return { t: lang === "en" ? "Price to follow" : "Preis folgt", tbc: true };
+    return { t: (s.prefix || "") + (s.from ? (lang === "en" ? "from " : "ab ") : "") + s.price + " €", tbc: false };
   }
   function photoEl(s) {
     var box = el("div", "ph-img");
@@ -21,17 +26,17 @@
       img.sizes = "(max-width:640px) 92vw, 380px";
       img.srcset = base + "photos/" + s.photo + "-720.webp 720w, " + base + "photos/" + s.photo + "-1440.webp 1440w";
       img.src = base + "photos/" + s.photo + "-720.webp";
-      img.alt = s.alt || s.name;
+      img.alt = salt(s);
     } else {
       img.src = base + "photos/platzhalter-foto-folgt.svg";
-      img.alt = "Platzhalter – Foto für " + s.name + " folgt";
+      img.alt = LANG === "en" ? "Placeholder – photo of " + sname(s) + " to follow" : "Platzhalter – Foto für " + s.name + " folgt";
     }
     box.appendChild(img); return box;
   }
   $$("[data-prices]").forEach(function (ul) {
     var p = ul.getAttribute("data-prices").split(".");
     D.locations[p[0]].services[p[1]].forEach(function (s) {
-      var li = el("li"); li.appendChild(el("span", "", s.name));
+      var li = el("li"); li.appendChild(el("span", "", sname(s)));
       var pt = priceText(s); li.appendChild(el("b", pt.tbc ? "tbc" : "", pt.t)); ul.appendChild(li);
     });
   });
@@ -39,7 +44,7 @@
     var p = wrap.getAttribute("data-services").split(".");
     D.locations[p[0]].services[p[1]].forEach(function (s) {
       var a = el("article", "svc-item"); a.appendChild(photoEl(s));
-      var row = el("div", "row"); row.appendChild(el("h4", "", s.name));
+      var row = el("div", "row"); row.appendChild(el("h4", "", sname(s)));
       var pt = priceText(s); row.appendChild(el("b", pt.tbc ? "tbc" : "", pt.t));
       a.appendChild(row); wrap.appendChild(a);
     });
@@ -127,38 +132,32 @@
 
   /* ---------- WhatsApp-Nachricht (nur im Browser) ---------- */
   var T = {
-    de: { hi: "Hallo! Ich helfe Ihnen, Ihre Terminanfrage für WhatsApp vorzubereiten. In welcher Sprache möchten Sie schreiben?",
+    de: { hi: "Hallo! Ich helfe Ihnen, Ihre Terminanfrage für WhatsApp vorzubereiten.",
           loc: "An welchem Standort möchten Sie Ihren Termin?", schwelmOnly: "In Schwelm bieten wir ausschließlich Pediküre an.",
           svc: "Maniküre oder Pediküre?", treat: "Welche Behandlung wünschen Sie?", date: "Wann hätten Sie gern Ihren Termin? (Wunsch – wir bestätigen persönlich)",
           name: "Wie ist Ihr Vorname?", namePh: "Vorname", ok: "Weiter", flex: "Ich bin flexibel",
           done: "Danke, {n}! Ihre Anfrage ist vorbereitet. Tippen Sie unten, um sie per WhatsApp zu senden. Ihr Termin wird persönlich per WhatsApp bestätigt.",
           wa: "Termin per WhatsApp anfragen", note: "Ihr Termin wird persönlich per WhatsApp bestätigt. Es wird nichts gespeichert – bitte keine Gesundheitsdaten angeben.",
           restart: "Neu beginnen", sub: "Assistent · Terminanfrage", mani: "Maniküre", pedi: "Pediküre",
-          slots: ["Vormittag", "Mittag", "Nachmittag", "Abend"], pickDate: "Bitte ein Datum wählen.",
+          slots: ["Vormittag", "Mittag", "Nachmittag", "Abend"], pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit",
+          choose: "Bitte wählen", first: "Erst Standort und Leistung wählen", fill: "Bitte alle Felder ausfüllen.", sOnly: "In Schwelm nur Pediküre.",
           msg: ["Hallo Misiats Nails, ich möchte gern einen Termin anfragen.", "Standort", "Behandlung", "Wunschtermin", "Name", "flexibel", "Bitte bestätigen Sie mir den Termin per WhatsApp. Danke!"] },
-    en: { hi: "", loc: "Which location would you like to visit?", schwelmOnly: "Our Schwelm studio offers pedicures only.",
+    en: { hi: "Hello! I’ll help you prepare your appointment request for WhatsApp.", loc: "Which location would you like to visit?", schwelmOnly: "Our Schwelm studio offers pedicures only.",
           svc: "Manicure or pedicure?", treat: "Which treatment would you like?", date: "When would you like your appointment? (preference – we confirm personally)",
           name: "What is your first name?", namePh: "First name", ok: "Next", flex: "I'm flexible",
           done: "Thank you, {n}! Your request is ready. Tap below to send it via WhatsApp. Your appointment will be confirmed personally via WhatsApp.",
           wa: "Request appointment via WhatsApp", note: "Your appointment is confirmed personally via WhatsApp. Nothing is stored – please do not share health information.",
           restart: "Start again", sub: "Assistant · Appointment request", mani: "Manicure", pedi: "Pedicure",
-          slots: ["Morning", "Midday", "Afternoon", "Evening"], pickDate: "Please choose a date.",
-          msg: ["Hello Misiats Nails, I would like to request an appointment.", "Location", "Treatment", "Preferred date", "Name", "flexible", "Please confirm the appointment via WhatsApp. Thank you!"] },
-    uk: { hi: "", loc: "У якому салоні ви бажаєте записатися?", schwelmOnly: "У Швельмі ми пропонуємо лише педикюр.",
-          svc: "Манікюр чи педикюр?", treat: "Яку процедуру ви бажаєте?", date: "Коли вам було б зручно? (побажання – ми підтвердимо особисто)",
-          name: "Як вас звати (ім'я)?", namePh: "Ім'я", ok: "Далі", flex: "Мені підходить будь-коли",
-          done: "Дякуємо, {n}! Ваш запит готовий. Натисніть нижче, щоб надіслати його у WhatsApp. Запис підтверджується особисто у WhatsApp.",
-          wa: "Записатися через WhatsApp", note: "Запис підтверджується особисто у WhatsApp. Нічого не зберігається – будь ласка, не вказуйте дані про здоров'я.",
-          restart: "Почати знову", sub: "Асистент · Запис", mani: "Манікюр", pedi: "Педикюр",
-          slots: ["Зранку", "Опівдні", "Після обіду", "Увечері"], pickDate: "Будь ласка, оберіть дату.",
-          msg: ["Добрий день, Misiats Nails! Я хочу записатися.", "Салон", "Процедура", "Бажаний час", "Ім'я", "будь-коли", "Будь ласка, підтвердьте запис у WhatsApp. Дякую!"] }
+          slots: ["Morning", "Midday", "Afternoon", "Evening"], pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day",
+          choose: "Please choose", first: "Choose location and service first", fill: "Please fill in all fields.", sOnly: "Pedicure only in Schwelm.",
+          msg: ["Hello Misiats Nails, I would like to request an appointment.", "Location", "Treatment", "Preferred date", "Name", "flexible", "Please confirm the appointment via WhatsApp. Thank you!"] }
   };
   function fmtDate(iso) { if (!iso) return ""; var p = iso.split("-"); return p[2] + "." + p[1] + "." + p[0]; }
   function buildWa(d) {
     var t = T[d.lang || "de"], L = D.locations[d.loc];
-    var svcName = (d.svc === "manikuere" ? T.de.mani : T.de.pedi);
+    var lg = d.lang || "de", svcName = (d.svc === "manikuere" ? t.mani : t.pedi), sv = findSvc(d.loc, d.svc, d.treat), tn = sv ? sname(sv, lg) : d.treat;
     var when = d.flex ? t.msg[5] : [fmtDate(d.date), d.slot].filter(Boolean).join(", ");
-    var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + (d.treat.indexOf(svcName) === 0 ? d.treat : svcName + " – " + d.treat), t.msg[3] + ": " + when, t.msg[4] + ": " + d.name, "", t.msg[6]].join("\n");
+    var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + (tn.toLowerCase().indexOf(svcName.toLowerCase()) >= 0 ? tn : svcName + " – " + tn), t.msg[3] + ": " + when, t.msg[4] + ": " + d.name, "", t.msg[6]].join("\n");
     return "https://wa.me/" + D.whatsapp + "?text=" + encodeURIComponent(m);
   }
   window.MNbuildWa = buildWa;
@@ -188,12 +187,9 @@
     function uiLang() { waBtn.textContent = t().wa; noteEl.textContent = t().note; $(".chat-head small", panel).textContent = t().sub; restartBtn.textContent = t().restart; }
     var restartBtn = $(".chat-restart", panel);
     function start(preset) {
-      st = { lang: "de" }; cb.textContent = ""; setWa(null); uiLang();
-      bot(T.de.hi);
-      chips([{ label: "Deutsch", value: "de" }, { label: "English", value: "en" }, { label: "Українська", value: "uk" }], function (v) {
-        st.lang = v; uiLang();
-        if (preset) { st.loc = preset[0]; afterLoc(preset[1]); } else askLoc();
-      });
+      st = { lang: LANG }; cb.textContent = ""; setWa(null); uiLang();
+      bot(t().hi);
+      if (preset) { st.loc = preset[0]; afterLoc(preset[1]); } else askLoc();
     }
     function askLoc() {
       bot(t().loc);
@@ -208,14 +204,14 @@
     function askTreat() {
       bot(t().treat);
       chips(D.locations[st.loc].services[st.svc].map(function (s) {
-        var p = priceText(s, st.lang); return { label: s.name + (p.tbc ? "" : " · " + p.t), value: s.name };
+        var p = priceText(s, st.lang); return { label: sname(s, st.lang) + (p.tbc ? "" : " · " + p.t), value: s.id };
       }), function (v) { st.treat = v; askDate(); });
     }
     function askDate() {
       bot(t().date);
       var row = el("div", "chat-in"), di = el("input"), sl = el("select"), ok = el("button", "", t().ok);
-      di.type = "date"; di.min = today(); di.setAttribute("aria-label", "Datum");
-      sl.setAttribute("aria-label", "Uhrzeit");
+      di.type = "date"; di.min = today(); di.setAttribute("aria-label", t().dateL);
+      sl.setAttribute("aria-label", t().slotL);
       t().slots.forEach(function (s) { var o = el("option", "", s); o.value = s; sl.appendChild(o); });
       ok.type = "button"; row.appendChild(di); row.appendChild(sl); row.appendChild(ok); cb.appendChild(row);
       var fx = el("div", "chips"), fb = el("button", "chip", t().flex); fb.type = "button"; fx.appendChild(fb); cb.appendChild(fx);
@@ -262,9 +258,9 @@
       maniR.disabled = loc === "schwelm";
       if (loc === "schwelm") $("#f-pedi", form).checked = true;
       var svc = val("svc"); sel.textContent = "";
-      var o0 = el("option", "", loc && svc ? "Bitte wählen" : "Erst Standort und Leistung wählen"); o0.value = ""; sel.appendChild(o0);
+      var o0 = el("option", "", loc && svc ? T[LANG].choose : T[LANG].first); o0.value = ""; sel.appendChild(o0);
       if (loc && svc) D.locations[loc].services[svc].forEach(function (s) {
-        var p = priceText(s), o = el("option", "", s.name + " – " + p.t); o.value = s.name; sel.appendChild(o);
+        var p = priceText(s), o = el("option", "", sname(s) + " – " + p.t); o.value = s.id; sel.appendChild(o);
       });
     }
     $$("input[type=radio]", form).forEach(function (r) { r.addEventListener("change", sync); });
@@ -274,9 +270,9 @@
     sync();
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var d = { lang: "de", loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, slot: $("#f-slot", form).value, name: cleanName($("#f-name", form).value) };
-      if (!d.loc || !d.svc || !d.treat || !d.date || !d.name) { err.textContent = "Bitte alle Felder ausfüllen."; return; }
-      if (d.loc === "schwelm" && d.svc !== "pedikuere") { err.textContent = "In Schwelm nur Pediküre."; return; }
+      var d = { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, slot: $("#f-slot", form).value, name: cleanName($("#f-name", form).value) };
+      if (!d.loc || !d.svc || !d.treat || !d.date || !d.name) { err.textContent = T[LANG].fill; return; }
+      if (d.loc === "schwelm" && d.svc !== "pedikuere") { err.textContent = T[LANG].sOnly; return; }
       err.textContent = ""; var url = buildWa(d); form.setAttribute("data-wa", url);
       window.open(url, "_blank", "noopener");
     });

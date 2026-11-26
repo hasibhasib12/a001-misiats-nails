@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.misiats-nails.de/sitemap.xml
+Sitemap: https://hasibhasib12.github.io/a001-misiats-nails/sitemap.xml

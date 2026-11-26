@@ -6,7 +6,8 @@ keine externen Schriften/Skripte/Einbettungen. Läuft direkt auf GitHub Pages od
 ## Struktur
 ```
 index.html  langerfeld.html  schwelm.html  leistungen.html  galerie.html  kontakt.html
-impressum.html  datenschutz.html  en/index.html  uk/index.html (Platzhalter für spätere Übersetzung)
+impressum.html  datenschutz.html (nur Deutsch, Platzhalter)  404.html
+en/ (englische Fassung aller 6 Hauptseiten)
 css/styles.css   js/prices.js (alle Preise + Kontaktdaten)   js/main.js (Menü, Chat, Formular, Galerie)
 fonts/ (Cormorant Garamond, Jost – selbst gehostet)   assets/misiats-nails-logo.png   photos/
 sitemap.xml  robots.txt  .nojekyll
@@ -53,3 +54,9 @@ Termine werden ausschließlich persönlich per WhatsApp bestätigt.
 2. Settings → Pages → Source: „Deploy from a branch“, Branch `main`, Ordner `/ (root)`.
 3. Optional eigene Domain unter Settings → Pages → Custom domain eintragen.
 Lokal testen: `python3 -m http.server` im Ordner starten und http://localhost:8000 öffnen.
+
+## Sprachen
+Deutsch (Hauptsprache, Wurzelverzeichnis) und Englisch (`en/`). Die Seiten werden mit dem Generator `gen.py` (Build-Notizen) erzeugt;
+Texte stehen dort in den Wörterbüchern `UI` und `TX`, Behandlungsnamen auf Englisch in `js/prices.js` (`en`, `alt_en`).
+Cache-Busting: Version `?v=` für CSS/JS in `gen.py` (`V`) erhöhen.
+SITE-URL (canonical, hreflang, sitemap) ist aktuell die GitHub-Pages-Adresse – bei eigener Domain in `gen.py` ändern.
