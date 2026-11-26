@@ -77,12 +77,12 @@
   });
 
   /* ---------- Galerie-Lightbox ---------- */
-  var lb = $(".lb"), lbImg = lb && $("img", lb), lbLast;
-  function closeLb() { lb.classList.remove("on"); body.classList.remove("lb-open"); if (lbLast) lbLast.focus(); }
+  var lb = $(".lb"), lbImg = lb && $("img", lb), lbLast, lbKb = false;
+  function closeLb() { lb.classList.remove("on"); body.classList.remove("lb-open"); if (lbLast) { if (!lbKb) lbLast.classList.add("no-ring"); try { lbLast.focus({ preventScroll: true, focusVisible: lbKb }); } catch (e) { lbLast.focus(); } } }
   if (lb) {
     $$(".mag button").forEach(function (b) {
       b.addEventListener("click", function () {
-        var i = $("img", b); lbLast = b; lbImg.src = b.getAttribute("data-full"); lbImg.alt = i.alt;
+        var i = $("img", b); lbLast = b; lbKb = false; lbImg.src = b.getAttribute("data-full"); lbImg.alt = i.alt;
         lb.classList.add("on"); body.classList.add("lb-open"); $(".lb-x", lb).focus();
       });
     });
@@ -115,11 +115,13 @@
     kstage.addEventListener("pointermove", function (e) { if (kx !== null) { kdx = e.clientX - kx; if (Math.abs(kdx) > 8) kmoved = true; } });
     function kup() { if (kx === null) return; kx = null; if (kdx < -45) kshow(kc + 1); else if (kdx > 45) kshow(kc - 1); }
     kstage.addEventListener("pointerup", kup); kstage.addEventListener("pointercancel", kup);
-    function kopen() { if (!lb) return; lbLast = kstage; lbImg.src = km[kc].getAttribute("data-full"); lbImg.alt = $("img", km[kc]).alt; lb.classList.add("on"); body.classList.add("lb-open"); $(".lb-x", lb).focus(); }
+    function kopen(kb) { if (!lb) return; lbKb = !!kb; lbLast = kstage; lbImg.src = km[kc].getAttribute("data-full"); lbImg.alt = $("img", km[kc]).alt; lb.classList.add("on"); body.classList.add("lb-open"); $(".lb-x", lb).focus(); }
+    kstage.addEventListener("blur", function () { kstage.classList.remove("no-ring"); });
+    kstage.addEventListener("keydown", function (e) { if (e.key === "Tab" || e.key === "ArrowLeft" || e.key === "ArrowRight") kstage.classList.remove("no-ring"); });
     kstage.addEventListener("click", function () { if (!kmoved) kopen(); kmoved = false; });
     kw.addEventListener("keydown", function (e) {
       if (e.key === "ArrowRight") { e.preventDefault(); kshow(kc + 1); } else if (e.key === "ArrowLeft") { e.preventDefault(); kshow(kc - 1); }
-      else if ((e.key === "Enter" || e.key === " ") && e.target === kstage) { e.preventDefault(); kopen(); }
+      else if ((e.key === "Enter" || e.key === " ") && e.target === kstage) { e.preventDefault(); kopen(true); }
     });
   }
 

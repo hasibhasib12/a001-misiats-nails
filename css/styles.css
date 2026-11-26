@@ -803,13 +803,14 @@ body.chat-open .chat-fab .ic-close{display:block}
 .two>*{min-width:0}
 .bform input[type=date]{-webkit-appearance:none;appearance:none;min-height:48px}
 
-/* ===== Homepage hero: Pexels #12982840 (Valeria Boltneva, Pexels License) – stock photo, not salon work ===== */
-.hero-photo{background:url(../photos/hero-daisy-desktop-1440.webp) 60% 50%/cover no-repeat}
-@media (min-width:1500px),(min-resolution:1.5dppx) and (min-width:641px){.hero-photo{background-image:url(../photos/hero-daisy-desktop-2400.webp)}}
-.hero-photo::after{background:linear-gradient(90deg,rgba(250,247,242,.95) 0%,rgba(250,247,242,.84) 30%,rgba(250,247,242,.32) 58%,rgba(250,247,242,.16) 100%),linear-gradient(0deg,rgba(250,247,242,.55) 0%,rgba(250,247,242,0) 30%)}
+/* ===== Homepage hero: eigene Arbeit – matte rote Mandelnägel mit Nail-Art (own-red-v2, Einwilligung bestätigt 26.11.2026 17:19) =====
+   Spare (not used): hero-daisy-* = Pexels #12982840 (Valeria Boltneva), stock photo, not salon work */
+.hero-photo{background:url(../photos/hero-red-matte-desktop-1440.webp) 70% 50%/cover no-repeat}
+@media (min-width:1500px),(min-resolution:1.5dppx) and (min-width:641px){.hero-photo{background-image:url(../photos/hero-red-matte-desktop-2400.webp)}}
+.hero-photo::after{background:linear-gradient(90deg,rgba(250,247,242,.9) 0%,rgba(250,247,242,.7) 32%,rgba(250,247,242,.12) 56%,rgba(250,247,242,0) 100%),linear-gradient(0deg,rgba(250,247,242,.45) 0%,rgba(250,247,242,0) 26%)}
 @media (max-width:640px){
- .hero-photo{background:url(../photos/hero-daisy-mobile-1000.webp) 50% 0%/cover no-repeat}
- .hero-photo::after{background:linear-gradient(0deg,rgba(250,247,242,.96) 0%,rgba(250,247,242,.86) 30%,rgba(250,247,242,.3) 52%,rgba(250,247,242,.12) 100%)}
+ .hero-photo{background:url(../photos/hero-red-matte-mobile-1000.webp) 50% 0%/cover no-repeat}
+ .hero-photo::after{background:linear-gradient(0deg,rgba(250,247,242,.94) 0%,rgba(250,247,242,.82) 32%,rgba(250,247,242,.2) 50%,rgba(250,247,242,0) 62%)}
 }
 
 /* ===== Galerie: Magazin-Split (Stil C) ===== */
@@ -835,3 +836,6 @@ body.chat-open .chat-fab .ic-close{display:block}
 @media (max-width:900px){.kc{grid-template-columns:1fr;gap:20px}.kc-no{font-size:72px}.kc-cap{font-size:38px}}
 @media (max-width:640px){.kc-wrap{width:calc(100% - 32px);padding:20px 0 72px}.kc-stage{border-radius:24px}.kc-no{font-size:60px}.kc-cap{font-size:32px;margin:2px 0 8px}.kc-rule{margin:14px 0}.kc-nav .kc-btn{display:none}.kc-t{flex-basis:70px;height:70px;border-radius:12px}.kc-strip{padding-top:18px}}
 @media (prefers-reduced-motion:reduce){.kc-m{transition:none;transform:none}}
+
+.kc-stage:focus:not(:focus-visible),.kc-stage.no-ring:focus{outline:none}
+.kc-stage:focus-visible:not(.no-ring){outline:2px solid var(--burgundy);outline-offset:4px}
