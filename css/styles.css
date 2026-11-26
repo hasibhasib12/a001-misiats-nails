@@ -864,3 +864,18 @@ body.chat-open .chat-fab .ic-close{display:block}
 .msg.wa-fb{background:#fff;border:1px dashed #cfc6c8}
 .f-fb{margin-top:10px}
 .bform a.wa-btn{text-align:center;justify-content:center}
+/* ===== Wunschuhrzeit (Formular + Chat) ===== */
+.seg.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.seg.slots label{display:flex;align-items:center;justify-content:center;min-height:46px;padding:8px 4px;font-size:15px;font-variant-numeric:tabular-nums;border-radius:14px}
+.seg.slots label.flex{grid-column:1/-1;border-style:dashed;border-radius:999px}
+.slot-note{margin-top:10px;font-size:13px;color:var(--secondary)}
+.chat-time{display:flex;flex-direction:column;gap:8px;background:#fff;border-radius:16px;padding:12px}
+.ct-date{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid #E2D9D3;border-radius:12px;background:#FBF9F6;min-height:46px;-webkit-appearance:none;appearance:none}
+.ct-l{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A5560;font-weight:500;margin-top:4px}
+.slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.slot{min-height:44px;border:1px solid rgba(110,20,35,.35);border-radius:12px;background:#fff;color:var(--burgundy);font:inherit;font-size:15px;font-variant-numeric:tabular-nums;cursor:pointer}
+.slot:hover,.slot:focus-visible{background:#FAF2F3}
+.slot:active{background:var(--burgundy);color:#fff}
+.ct-note{font-size:12px;color:var(--secondary)}
+.ct-flex{align-self:flex-start;min-height:40px}
+@media (max-width:640px){.seg.slots{grid-template-columns:repeat(4,1fr)}}

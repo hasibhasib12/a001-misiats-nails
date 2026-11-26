@@ -9,7 +9,11 @@
    ================================================================ */
 window.MN = {
   pricesConfirmed: false,
-  whatsapp: "491726127991",           // +49 172 6127991 (bestätigt 26.11.2026)
+  whatsapp: "491726127991",
+  /* Wunschuhrzeit-Auswahl (Chat + Formular). Öffnungszeiten noch NICHT bestätigt –
+     hier anpassen: erste/letzte Uhrzeit, Abstand in Minuten, geschlossene Wochentage
+     (0 = Sonntag, 1 = Montag … 6 = Samstag), z. B. closedDays: [0] */
+  booking: { first: "10:00", last: "19:30", stepMin: 30, closedDays: [] },           // +49 172 6127991 (bestätigt 26.11.2026)
   locations: {
     langerfeld: {
       name: "Wuppertal-Langerfeld",

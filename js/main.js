@@ -134,30 +134,39 @@
   var T = {
     de: { hi: "Hallo! Ich helfe Ihnen, Ihre Terminanfrage für WhatsApp vorzubereiten.",
           loc: "An welchem Standort möchten Sie Ihren Termin?", schwelmOnly: "In Schwelm bieten wir ausschließlich Pediküre an.",
-          svc: "Maniküre oder Pediküre?", treat: "Welche Behandlung wünschen Sie?", date: "Wann hätten Sie gern Ihren Termin? (Wunsch – wir bestätigen persönlich)",
+          svc: "Maniküre oder Pediküre?", treat: "Welche Behandlung wünschen Sie?", date: "Wählen Sie bitte Ihr Wunschdatum und Ihre Wunschuhrzeit.",
           name: "Wie ist Ihr Vorname?", namePh: "Vorname", ok: "Weiter", flex: "Ich bin flexibel",
           done: "Danke, {n}! Ihre Anfrage ist vorbereitet. Tippen Sie unten, um sie per WhatsApp zu senden. Ihr Termin wird persönlich per WhatsApp bestätigt.",
           wa: "Termin per WhatsApp anfragen", note: "Ihr Termin wird persönlich per WhatsApp bestätigt. Es wird nichts gespeichert – bitte keine Gesundheitsdaten angeben.",
           restart: "Neu beginnen", sub: "Assistent · Terminanfrage", mani: "Maniküre", pedi: "Pediküre",
-          slots: ["Vormittag", "Mittag", "Nachmittag", "Abend"], pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit", wDate: "Wunschdatum", wTime: "Tageszeit",
+          pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit", wDate: "Wunschdatum", wTime: "Wunschuhrzeit", timeL: "Wunschuhrzeit", tNote: "Ihr Termin wird persönlich per WhatsApp bestätigt.", flexT: "flexibel", pickTime: "Bitte eine Wunschuhrzeit wählen.", closed: "An diesem Tag ist leider geschlossen – bitte ein anderes Datum wählen.",
+          days: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
           choose: "Bitte wählen", first: "Erst Standort und Leistung wählen", fill: "Bitte alle Felder ausfüllen.", sOnly: "In Schwelm nur Pediküre.",
           msg: ["Hallo Misiats Nails, ich möchte gern einen Termin anfragen.", "Standort", "Behandlung", "Wunschtermin", "Name", "flexibel", "Bitte bestätigen Sie mir den Termin per WhatsApp. Danke!"] },
     en: { hi: "Hello! I’ll help you prepare your appointment request for WhatsApp.", loc: "Which location would you like to visit?", schwelmOnly: "Our Schwelm studio offers pedicures only.",
-          svc: "Manicure or pedicure?", treat: "Which treatment would you like?", date: "When would you like your appointment? (preference – we confirm personally)",
+          svc: "Manicure or pedicure?", treat: "Which treatment would you like?", date: "Please choose your preferred date and time.",
           name: "What is your first name?", namePh: "First name", ok: "Next", flex: "I'm flexible",
           done: "Thank you, {n}! Your request is ready. Tap below to send it via WhatsApp. Your appointment will be confirmed personally via WhatsApp.",
           wa: "Request appointment via WhatsApp", note: "Your appointment is confirmed personally via WhatsApp. Nothing is stored – please do not share health information.",
           restart: "Start again", sub: "Assistant · Appointment request", mani: "Manicure", pedi: "Pedicure",
-          slots: ["Morning", "Midday", "Afternoon", "Evening"], pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day", wDate: "Preferred date", wTime: "Time of day",
+          pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day", wDate: "Preferred date", wTime: "Preferred time", timeL: "Preferred time", tNote: "Your appointment will be confirmed personally via WhatsApp.", flexT: "flexible", pickTime: "Please choose a preferred time.", closed: "Sorry, we are closed on that day – please choose another date.",
+          days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
           choose: "Please choose", first: "Choose location and service first", fill: "Please fill in all fields.", sOnly: "Pedicure only in Schwelm.",
           msg: ["Hello Misiats Nails, I would like to request an appointment.", "Location", "Treatment", "Preferred date", "Name", "flexible", "Please confirm the appointment via WhatsApp. Thank you!"] }
   };
+  function pd(iso) { var p = iso.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function longDate(iso, lg) { if (!iso) return ""; var d = pd(iso), t = T[lg || LANG];
+    return lg === "en" ? t.days[d.getDay()] + ", " + d.getDate() + " " + t.months[d.getMonth()] + " " + d.getFullYear() : t.days[d.getDay()] + ", " + fmtDate(iso); }
+  function slotsList() { var B = D.booking || { first: "10:00", last: "19:30", stepMin: 30 }, r = [];
+    function m(x) { var p = x.split(":"); return +p[0] * 60 + +p[1]; }
+    for (var x = m(B.first); x <= m(B.last); x += B.stepMin) r.push((x < 600 ? "0" : "") + Math.floor(x / 60) + ":" + (x % 60 < 10 ? "0" : "") + (x % 60));
+    return r; }
+  function isClosed(iso) { var c = (D.booking && D.booking.closedDays) || []; return !!iso && c.indexOf(pd(iso).getDay()) >= 0; }
   function fmtDate(iso) { if (!iso) return ""; var p = iso.split("-"); return p[2] + "." + p[1] + "." + p[0]; }
   function buildWa(d) {
     var t = T[d.lang || "de"], L = D.locations[d.loc];
     var lg = d.lang || "de", svcName = (d.svc === "manikuere" ? t.mani : t.pedi), sv = findSvc(d.loc, d.svc, d.treat), tn = sv ? sname(sv, lg) : d.treat;
-    var when = d.flex ? t.msg[5] : [fmtDate(d.date), d.slot].filter(Boolean).join(", ");
-    var whenLines = d.flex ? [t.msg[3] + ": " + t.msg[5]] : [t.wDate + ": " + fmtDate(d.date), t.wTime + ": " + (d.slot || "–")];
+    var whenLines = (d.flex && !d.date) ? [t.msg[3] + ": " + t.msg[5]] : [t.wDate + ": " + longDate(d.date, lg), t.wTime + ": " + (d.time && d.time !== "flex" ? d.time : t.flexT)];
     var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + (tn.toLowerCase().indexOf(svcName.toLowerCase()) >= 0 ? tn : svcName + " – " + tn)].concat(whenLines, [t.msg[4] + ": " + d.name, "", t.msg[6]]).join("\n");
     return "https://wa.me/" + D.whatsapp + "?text=" + encodeURIComponent(m);
   }
@@ -219,18 +228,28 @@
     }
     function askDate() {
       bot(t().date);
-      var row = el("div", "chat-in"), di = el("input"), sl = el("select"), ok = el("button", "", t().ok);
-      di.type = "date"; di.min = today(); di.setAttribute("aria-label", t().dateL);
-      sl.setAttribute("aria-label", t().slotL);
-      t().slots.forEach(function (s) { var o = el("option", "", s); o.value = s; sl.appendChild(o); });
-      ok.type = "button"; row.appendChild(di); row.appendChild(sl); row.appendChild(ok); cb.appendChild(row);
-      var fx = el("div", "chips"), fb = el("button", "chip", t().flex); fb.type = "button"; fx.appendChild(fb); cb.appendChild(fx);
-      cb.scrollTop = cb.scrollHeight;
-      ok.addEventListener("click", function () {
-        if (!di.value) { di.focus(); return bot(t().pickDate); }
-        st.date = di.value; st.slot = sl.value; st.flex = false; row.remove(); fx.remove(); me(fmtDate(st.date) + ", " + st.slot); askName();
+      var box = el("div", "chat-time"), di = el("input");
+      di.type = "date"; di.min = today(); di.setAttribute("aria-label", t().wDate); di.className = "ct-date";
+      box.appendChild(el("p", "ct-l", t().wDate)); box.appendChild(di);
+      box.appendChild(el("p", "ct-l", t().timeL));
+      var grid = el("div", "slot-grid");
+      slotsList().forEach(function (tm) {
+        var bt = el("button", "slot", tm); bt.type = "button"; bt.setAttribute("aria-label", t().timeL + " " + tm);
+        bt.addEventListener("click", function () {            /* Werte werden beim Tippen gelesen */
+          if (!di.value) { di.focus(); return bot(t().pickDate); }
+          if (isClosed(di.value)) { di.focus(); return bot(t().closed); }
+          st.date = di.value; st.time = tm; st.flex = false; box.remove(); me(longDate(st.date, st.lang) + " · " + tm); askName();
+        });
+        grid.appendChild(bt);
       });
-      fb.addEventListener("click", function () { st.flex = true; row.remove(); fx.remove(); me(t().flex); askName(); });
+      box.appendChild(grid);
+      box.appendChild(el("p", "ct-note", t().tNote));
+      var fb = el("button", "chip ct-flex", t().flex); fb.type = "button"; box.appendChild(fb);
+      cb.appendChild(box); cb.scrollTop = cb.scrollHeight;
+      fb.addEventListener("click", function () {
+        st.flex = true; st.time = "flex"; st.date = (di.value && !isClosed(di.value)) ? di.value : ""; box.remove();
+        me(st.date ? longDate(st.date, st.lang) + " · " + t().flex : t().flex); askName();
+      });
     }
     function askName() {
       bot(t().name);
@@ -280,14 +299,19 @@
     if (ps === "manikuere" || ps === "pedikuere") { $(ps === "manikuere" ? "#f-mani" : "#f-pedi", form).checked = true; }
     sync();
     var fwa = $(".f-wa", form), ffb = $(".f-fb", form);
-    function collect() { return { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, slot: $("#f-slot", form).value, name: cleanName($("#f-name", form).value) }; }
-    function problem(d) { if (!d.loc || !d.svc || !d.treat || !d.date || !d.name) return T[LANG].fill; if (d.loc === "schwelm" && d.svc !== "pedikuere") return T[LANG].sOnly; return ""; }
+    function collect() { var d = { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, time: val("time"), name: cleanName($("#f-name", form).value) }; d.flex = d.time === "flex"; return d; }
+    function problem(d) { if (!d.loc || !d.svc || !d.treat || !d.date || !d.time || !d.name) return (!d.time && d.loc && d.svc && d.treat && d.date && d.name) ? T[LANG].pickTime : T[LANG].fill; if (isClosed(d.date)) return T[LANG].closed; if (d.loc === "schwelm" && d.svc !== "pedikuere") return T[LANG].sOnly; return ""; }
     function refresh() {   /* href wird bei jeder Änderung synchron aktualisiert */
       var d = collect(), pr = problem(d);
       if (pr) { fwa.href = "https://wa.me/" + D.whatsapp; fwa.removeAttribute("target"); fwa.setAttribute("data-ready", "0"); ffb.hidden = true; form.removeAttribute("data-wa"); return null; }
       var url = buildWa(d); linkWa(fwa, url); fwa.setAttribute("data-ready", "1"); form.setAttribute("data-wa", url); err.textContent = ""; fallback(ffb, url); return url;
     }
-    $("#f-slot", form).addEventListener("change", refresh);
+    var sg = $("[data-slots]", form);
+    slotsList().concat(["flex"]).forEach(function (tm, i) {
+      var id = "f-t" + i, inp = el("input"), lab = el("label", tm === "flex" ? "flex" : "", tm === "flex" ? T[LANG].flex : tm);
+      inp.type = "radio"; inp.name = "time"; inp.id = id; inp.value = tm; lab.htmlFor = id; sg.appendChild(inp); sg.appendChild(lab);
+      inp.addEventListener("change", refresh);
+    });
     ["input", "change"].forEach(function (ev) { form.addEventListener(ev, function () { setTimeout(refresh, 0); }); });
     form.addEventListener("change", function (e) { if (e.target.name === "loc" || e.target.name === "svc") refresh(); });
     fwa.addEventListener("click", function (e) {
