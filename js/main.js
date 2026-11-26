@@ -161,6 +161,14 @@
     return "https://wa.me/" + D.whatsapp + "?text=" + encodeURIComponent(m);
   }
   window.MNbuildWa = buildWa;
+  /* WhatsApp-Übergabe: echter Link (<a href="https://wa.me/...">), Tap navigiert nativ.
+     Auf Touch-Geräten im selben Tab (kein target=_blank / window.open → kein Popup-Blocker,
+     funktioniert auch in In-App-Browsern von Instagram/Facebook/TikTok und öffnet die App). */
+  var DESK = !((window.matchMedia && window.matchMedia("(pointer: coarse)").matches) || /Android|iPhone|iPad|iPod|Mobile|FBAN|FBAV|Instagram/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)));
+  function linkWa(a, url) { a.href = url; if (DESK) a.target = "_blank"; else a.removeAttribute("target"); a.rel = "noopener"; }
+  var FB = { de: ["Öffnet sich WhatsApp nicht?", "Hier tippen", "oder direkt schreiben an +49 172 6127991."],
+             en: ["WhatsApp didn’t open?", "Tap here", "or message us directly at +49 172 6127991."] }[LANG];
+  function fallback(box, url) { box.textContent = ""; box.appendChild(document.createTextNode(FB[0] + " ")); var a = el("a", "", FB[1]); linkWa(a, url); box.appendChild(a); box.appendChild(document.createTextNode(" " + FB[2])); box.hidden = false; }
   function today() { var n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); return n.toISOString().slice(0, 10); }
   function cleanName(v) { return v.replace(/[<>{}\[\]\\\/@0-9]/g, "").replace(/\s+/g, " ").trim().slice(0, 30); }
 
@@ -181,11 +189,12 @@
     }
     function t() { return T[st.lang]; }
     function setWa(url) {
-      if (url) { waBtn.href = url; waBtn.removeAttribute("aria-disabled"); waBtn.removeAttribute("tabindex"); }
-      else { waBtn.href = "#"; waBtn.setAttribute("aria-disabled", "true"); waBtn.setAttribute("tabindex", "-1"); }
+      if (url) { linkWa(waBtn, url); waBtn.removeAttribute("aria-disabled"); waBtn.removeAttribute("tabindex"); }
+      else { waBtn.href = "https://wa.me/" + D.whatsapp; waBtn.removeAttribute("target"); waBtn.setAttribute("aria-disabled", "true"); waBtn.setAttribute("tabindex", "-1"); }
     }
     function uiLang() { waBtn.textContent = t().wa; noteEl.textContent = t().note; $(".chat-head small", panel).textContent = t().sub; restartBtn.textContent = t().restart; }
     var restartBtn = $(".chat-restart", panel);
+    waBtn.addEventListener("click", function (e) { if (waBtn.getAttribute("aria-disabled") === "true") e.preventDefault(); });
     function start(preset) {
       st = { lang: LANG }; cb.textContent = ""; setWa(null); uiLang();
       bot(t().hi);
@@ -230,7 +239,8 @@
       row.addEventListener("submit", function (e) {
         e.preventDefault(); var n = cleanName(ni.value); if (!n) return ni.focus();
         st.name = n; row.remove(); me(n);
-        bot(t().done.replace("{n}", n)); setWa(buildWa(st)); waBtn.focus({ preventScroll: true });
+        bot(t().done.replace("{n}", n)); var u = buildWa(st); setWa(u);
+        var fb = el("div", "msg bot wa-fb"); fallback(fb, u); cb.appendChild(fb); cb.scrollTop = cb.scrollHeight; waBtn.focus({ preventScroll: true });
       });
     }
     function openChat(preset) { body.classList.add("chat-open"); fab.setAttribute("aria-expanded", "true"); if (preset || !st) start(preset); }
@@ -268,13 +278,26 @@
     if (pl && D.locations[pl]) { $("#f-" + pl, form).checked = true; }
     if (ps === "manikuere" || ps === "pedikuere") { $(ps === "manikuere" ? "#f-mani" : "#f-pedi", form).checked = true; }
     sync();
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var d = { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, slot: $("#f-slot", form).value, name: cleanName($("#f-name", form).value) };
-      if (!d.loc || !d.svc || !d.treat || !d.date || !d.name) { err.textContent = T[LANG].fill; return; }
-      if (d.loc === "schwelm" && d.svc !== "pedikuere") { err.textContent = T[LANG].sOnly; return; }
-      err.textContent = ""; var url = buildWa(d); form.setAttribute("data-wa", url);
-      window.open(url, "_blank", "noopener");
+    var fwa = $(".f-wa", form), ffb = $(".f-fb", form);
+    function collect() { return { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, slot: $("#f-slot", form).value, name: cleanName($("#f-name", form).value) }; }
+    function problem(d) { if (!d.loc || !d.svc || !d.treat || !d.date || !d.name) return T[LANG].fill; if (d.loc === "schwelm" && d.svc !== "pedikuere") return T[LANG].sOnly; return ""; }
+    function refresh() {   /* href wird bei jeder Änderung synchron aktualisiert */
+      var d = collect(), pr = problem(d);
+      if (pr) { fwa.href = "https://wa.me/" + D.whatsapp; fwa.removeAttribute("target"); fwa.setAttribute("data-ready", "0"); ffb.hidden = true; form.removeAttribute("data-wa"); return null; }
+      var url = buildWa(d); linkWa(fwa, url); fwa.setAttribute("data-ready", "1"); form.setAttribute("data-wa", url); err.textContent = ""; fallback(ffb, url); return url;
+    }
+    ["input", "change"].forEach(function (ev) { form.addEventListener(ev, function () { setTimeout(refresh, 0); }); });
+    form.addEventListener("change", function (e) { if (e.target.name === "loc" || e.target.name === "svc") refresh(); });
+    fwa.addEventListener("click", function (e) {
+      var url = refresh();
+      if (!url) { e.preventDefault(); err.textContent = problem(collect()); }
+      /* sonst: native Navigation über den echten Link */
     });
+    form.addEventListener("submit", function (e) {   /* Enter-Taste */
+      e.preventDefault(); var url = refresh();
+      if (!url) { err.textContent = problem(collect()); return; }
+      if (DESK) window.open(url, "_blank", "noopener"); else location.href = url;
+    });
+    refresh();
   }
 })();

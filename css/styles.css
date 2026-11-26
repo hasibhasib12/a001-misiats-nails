@@ -858,3 +858,9 @@ body.chat-open .chat-fab .ic-close{display:block}
 .nf-link{color:var(--burgundy);font-size:15px}
 .nf-list{list-style:none;padding:0;display:grid;gap:10px}
 .nf-list a{color:var(--text);font-size:16px}
+/* WhatsApp-Fallback-Link */
+.wa-fb{font-size:13px;line-height:1.5;color:var(--secondary)}
+.wa-fb a{color:#0E7A3E;font-weight:600;text-decoration:underline}
+.msg.wa-fb{background:#fff;border:1px dashed #cfc6c8}
+.f-fb{margin-top:10px}
+.bform a.wa-btn{text-align:center;justify-content:center}
