@@ -1,4 +1,6 @@
 /* Misiats Nails – main.js (kein Tracking, keine Cookies, kein Speicher) */
+/* WhatsApp-Nummer des Studios (international, ohne +), Anzeige: +49 172 6127991 */
+const STUDIO_WHATSAPP_NUMBER = "491726127991";
 (function () {
   "use strict";
   var D = window.MN, body = document.body;
@@ -7,7 +9,8 @@
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   var params = new URLSearchParams(location.search);
   var base = body.getAttribute("data-base") || "";
-  var LANG = document.documentElement.lang === "en" ? "en" : "de";
+  /* Sprache aus dem Pfad: /en/ = Englisch, sonst Deutsch (Seitenstamm) */
+  var LANG = /\/en\//.test(window.location.pathname) ? "en" : (/\/de\//.test(window.location.pathname) ? "de" : (document.documentElement.lang === "en" ? "en" : "de"));
   function sname(s, lg) { return ((lg || LANG) === "en" && s.en) || s.name; }
   function salt(s) { return (LANG === "en" && s.alt_en) || s.alt || sname(s); }
   function findSvc(loc, svc, id) { var r = null; D.locations[loc].services[svc].forEach(function (s) { if (s.id === id) r = s; }); return r; }
@@ -68,7 +71,7 @@
       im.loading = "lazy"; im.decoding = "async"; im.width = s.dim[0]; im.height = s.dim[1];
       im.sizes = "(max-width:640px) 92vw, 400px";
       im.srcset = base + "photos/" + s.photo + "-720.webp 720w, " + base + "photos/" + s.photo + "-1440.webp 1440w";
-      im.src = base + "photos/" + s.photo + "-720.webp"; im.alt = salt(s); f.appendChild(im); a.appendChild(f);
+      im.src = base + "photos/" + s.photo + "-720.webp"; im.alt = salt(s) + " – " + (svc === "manikuere" ? (LANG === "en" ? "manicure in " : "Maniküre in ") : (LANG === "en" ? "pedicure in " : "Pediküre in ")) + L.name; f.appendChild(im); a.appendChild(f);
       var t = el("div", "pc-text");
       t.appendChild(el("p", "pc-side", c.side[LANG]));
       t.appendChild(el("p", "pc-h", c.h[LANG]));
@@ -180,7 +183,7 @@
           name: "Wie ist Ihr Vorname?", namePh: "Vorname", ok: "Weiter", flex: "Ich bin flexibel",
           done: "Danke, {n}! Ihre Anfrage ist vorbereitet. Tippen Sie unten, um sie per WhatsApp zu senden. Ihr Termin wird persönlich per WhatsApp bestätigt.",
           wa: "Termin per WhatsApp anfragen", note: "Ihr Termin wird persönlich per WhatsApp bestätigt. Es wird nichts gespeichert – bitte keine Gesundheitsdaten angeben.",
-          restart: "Neu beginnen", sub: "Assistent · Terminanfrage", mani: "Maniküre", pedi: "Pediküre",
+          restart: "Neu beginnen", sub: "Assistent · Terminanfrage", mani: "Maniküre", pedi: "Pediküre", both: "Maniküre & Pediküre", treatM: "Welche Maniküre wünschen Sie?", treatP: "Und welche Pediküre wünschen Sie?",
           pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit", wDate: "Wunschdatum", wTime: "Wunschuhrzeit", timeL: "Wunschuhrzeit", tNote: "Ihr Termin wird persönlich per WhatsApp bestätigt.", flexT: "flexibel", pickTime: "Bitte eine Wunschuhrzeit wählen.", closed: "Sonntags ist geschlossen – bitte einen Tag von Montag bis Samstag wählen.",
           days: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
           choose: "Bitte wählen", first: "Erst Standort und Leistung wählen", fill: "Bitte alle Felder ausfüllen.", sOnly: "In Schwelm nur Pediküre.",
@@ -190,7 +193,7 @@
           name: "What is your first name?", namePh: "First name", ok: "Next", flex: "I'm flexible",
           done: "Thank you, {n}! Your request is ready. Tap below to send it via WhatsApp. Your appointment will be confirmed personally via WhatsApp.",
           wa: "Request appointment via WhatsApp", note: "Your appointment is confirmed personally via WhatsApp. Nothing is stored – please do not share health information.",
-          restart: "Start again", sub: "Assistant · Appointment request", mani: "Manicure", pedi: "Pedicure",
+          restart: "Start again", sub: "Assistant · Appointment request", mani: "Manicure", pedi: "Pedicure", both: "Manicure & pedicure", treatM: "Which manicure would you like?", treatP: "And which pedicure would you like?",
           pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day", wDate: "Preferred date", wTime: "Preferred time", timeL: "Preferred time", tNote: "Your appointment will be confirmed personally via WhatsApp.", flexT: "flexible", pickTime: "Please choose a preferred time.", closed: "We are closed on Sundays – please choose a day from Monday to Saturday.",
           days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
           choose: "Please choose", first: "Choose location and service first", fill: "Please fill in all fields.", sOnly: "Pedicure only in Schwelm.",
@@ -207,10 +210,13 @@
   function fmtDate(iso) { if (!iso) return ""; var p = iso.split("-"); return p[2] + "." + p[1] + "." + p[0]; }
   function buildWa(d) {
     var t = T[d.lang || "de"], L = D.locations[d.loc];
-    var lg = d.lang || "de", svcName = (d.svc === "manikuere" ? t.mani : t.pedi), sv = findSvc(d.loc, d.svc, d.treat), tn = sv ? sname(sv, lg) : d.treat;
+    var lg = d.lang || "de";
+    function tline(grp, id) { var sn = grp === "manikuere" ? t.mani : t.pedi, sv = findSvc(d.loc, grp, id), tn = sv ? sname(sv, lg) : id;
+      return tn.toLowerCase().indexOf(sn.toLowerCase()) >= 0 ? tn : sn + " – " + tn; }
+    var treatTxt = d.svc === "beide" ? tline("manikuere", d.treat) + " + " + tline("pedikuere", d.treat2) : tline(d.svc, d.treat);
     var whenLines = (d.flex && !d.date) ? [t.msg[3] + ": " + t.msg[5]] : [t.wDate + ": " + longDate(d.date, lg), t.wTime + ": " + (d.time && d.time !== "flex" ? d.time : t.flexT)];
-    var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + (tn.toLowerCase().indexOf(svcName.toLowerCase()) >= 0 ? tn : svcName + " – " + tn)].concat(whenLines, [t.msg[4] + ": " + d.name, "", t.msg[6]]).join("\n");
-    return "https://wa.me/" + D.whatsapp + "?text=" + encodeURIComponent(m);
+    var m = [t.msg[0], "", t.msg[1] + ": " + L.name, t.msg[2] + ": " + treatTxt].concat(whenLines, [t.msg[4] + ": " + d.name, "", t.msg[6]]).join("\n");
+    return "https://wa.me/" + STUDIO_WHATSAPP_NUMBER + "?text=" + encodeURIComponent(m);
   }
   window.MNbuildWa = buildWa;
   /* WhatsApp-Übergabe: echter Link (<a href="https://wa.me/...">), Tap navigiert nativ.
@@ -242,7 +248,7 @@
     function t() { return T[st.lang]; }
     function setWa(url) {
       if (url) { linkWa(waBtn, url); waBtn.removeAttribute("aria-disabled"); waBtn.removeAttribute("tabindex"); }
-      else { waBtn.href = "https://wa.me/" + D.whatsapp; waBtn.removeAttribute("target"); waBtn.setAttribute("aria-disabled", "true"); waBtn.setAttribute("tabindex", "-1"); }
+      else { waBtn.href = "https://wa.me/" + STUDIO_WHATSAPP_NUMBER; waBtn.removeAttribute("target"); waBtn.setAttribute("aria-disabled", "true"); waBtn.setAttribute("tabindex", "-1"); }
     }
     function uiLang() { waBtn.textContent = t().wa; noteEl.textContent = t().note; $(".chat-head small", panel).textContent = t().sub; restartBtn.textContent = t().restart; }
     var restartBtn = $(".chat-restart", panel);
@@ -260,13 +266,21 @@
       if (st.loc === "schwelm") { bot(t().schwelmOnly); st.svc = "pedikuere"; return askTreat(); }
       if (svc) { st.svc = svc; return askTreat(); }
       bot(t().svc);
-      chips([{ label: t().mani, value: "manikuere" }, { label: t().pedi, value: "pedikuere" }], function (v) { st.svc = v; askTreat(); });
+      chips([{ label: t().mani, value: "manikuere" }, { label: t().pedi, value: "pedikuere" }, { label: t().both, value: "beide" }], function (v) { st.svc = v; askTreat(); });
+    }
+    function treatChips(grp, fn) {
+      chips(D.locations[st.loc].services[grp].map(function (s) {
+        var p = priceText(s, st.lang); return { label: sname(s, st.lang) + (p.tbc ? "" : " · " + p.t), value: s.id };
+      }), fn);
     }
     function askTreat() {
+      if (st.loc === "schwelm") st.svc = "pedikuere";   /* Schwelm: ausschließlich Pediküre */
+      if (st.svc === "beide") {   /* Maniküre & Pediküre (nur Langerfeld): beide Behandlungen nacheinander */
+        bot(t().treatM);
+        return treatChips("manikuere", function (v) { st.treat = v; bot(t().treatP); treatChips("pedikuere", function (v2) { st.treat2 = v2; askDate(); }); });
+      }
       bot(t().treat);
-      chips(D.locations[st.loc].services[st.svc].map(function (s) {
-        var p = priceText(s, st.lang); return { label: sname(s, st.lang) + (p.tbc ? "" : " · " + p.t), value: s.id };
-      }), function (v) { st.treat = v; askDate(); });
+      treatChips(st.svc, function (v) { st.treat = v; askDate(); });
     }
     function askDate() {
       bot(t().date);
@@ -331,27 +345,35 @@
     var sel = $("#f-treat", form), err = $(".ferr", form), di = $("#f-date", form);
     di.min = today();
     function val(n) { var c = $("input[name=" + n + "]:checked", form); return c ? c.value : ""; }
-    function sync() {
-      var loc = val("loc"), maniR = $("#f-mani", form);
-      maniR.disabled = loc === "schwelm";
-      if (loc === "schwelm") $("#f-pedi", form).checked = true;
-      var svc = val("svc"); sel.textContent = "";
-      var o0 = el("option", "", loc && svc ? T[LANG].choose : T[LANG].first); o0.value = ""; sel.appendChild(o0);
-      if (loc && svc) D.locations[loc].services[svc].forEach(function (s) {
-        var p = priceText(s), o = el("option", "", sname(s) + " – " + p.t); o.value = s.id; sel.appendChild(o);
+    var sel2 = $("#f-treat2", form), t2box = $(".f-t2", form);
+    function fill(box, loc, grp, ok) {
+      var keep = box.value; box.textContent = "";
+      var o0 = el("option", "", ok ? T[LANG].choose : T[LANG].first); o0.value = ""; box.appendChild(o0);
+      if (ok) D.locations[loc].services[grp].forEach(function (s) {
+        var p = priceText(s), o = el("option", "", sname(s) + " – " + p.t); o.value = s.id; box.appendChild(o);
       });
+      box.value = keep; if (box.value !== keep) box.value = "";
+    }
+    function sync() {
+      var loc = val("loc"), maniR = $("#f-mani", form), bothR = $("#f-both", form);
+      maniR.disabled = bothR.disabled = loc === "schwelm";   /* Schwelm: nur Pediküre */
+      if (loc === "schwelm") $("#f-pedi", form).checked = true;
+      var svc = val("svc"), ok = !!(loc && svc);
+      fill(sel, loc, svc === "beide" ? "manikuere" : svc, ok);
+      t2box.hidden = svc !== "beide"; sel2.required = svc === "beide";
+      fill(sel2, loc, "pedikuere", ok && svc === "beide");
     }
     $$("input[type=radio]", form).forEach(function (r) { r.addEventListener("change", sync); });
     var pl = params.get("loc"), ps = params.get("svc");
     if (pl && D.locations[pl]) { $("#f-" + pl, form).checked = true; }
-    if (ps === "manikuere" || ps === "pedikuere") { $(ps === "manikuere" ? "#f-mani" : "#f-pedi", form).checked = true; }
+    if (ps === "manikuere" || ps === "pedikuere" || ps === "beide") { $(ps === "manikuere" ? "#f-mani" : ps === "beide" ? "#f-both" : "#f-pedi", form).checked = true; }
     sync();
     var fwa = $(".f-wa", form), ffb = $(".f-fb", form);
-    function collect() { var d = { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, date: di.value, time: val("time"), name: cleanName($("#f-name", form).value) }; d.flex = d.time === "flex"; return d; }
-    function problem(d) { if (!d.loc || !d.svc || !d.treat || !d.date || !d.time || !d.name) return (!d.time && d.loc && d.svc && d.treat && d.date && d.name) ? T[LANG].pickTime : T[LANG].fill; if (isClosed(d.date)) return T[LANG].closed; if (d.loc === "schwelm" && d.svc !== "pedikuere") return T[LANG].sOnly; return ""; }
+    function collect() { var d = { lang: LANG, loc: val("loc"), svc: val("svc"), treat: sel.value, treat2: sel2.value, date: di.value, time: val("time"), name: cleanName($("#f-name", form).value) }; d.flex = d.time === "flex"; return d; }
+    function problem(d) { if (d.svc === "beide" && !d.treat2 && d.loc !== "schwelm") return T[LANG].fill; if (!d.loc || !d.svc || !d.treat || !d.date || !d.time || !d.name) return (!d.time && d.loc && d.svc && d.treat && d.date && d.name) ? T[LANG].pickTime : T[LANG].fill; if (isClosed(d.date)) return T[LANG].closed; if (d.loc === "schwelm" && d.svc !== "pedikuere") return T[LANG].sOnly; return ""; }
     function refresh() {   /* href wird bei jeder Änderung synchron aktualisiert */
       var d = collect(), pr = problem(d);
-      if (pr) { fwa.href = "https://wa.me/" + D.whatsapp; fwa.removeAttribute("target"); fwa.setAttribute("data-ready", "0"); ffb.hidden = true; form.removeAttribute("data-wa"); return null; }
+      if (pr) { fwa.href = "https://wa.me/" + STUDIO_WHATSAPP_NUMBER; fwa.removeAttribute("target"); fwa.setAttribute("data-ready", "0"); ffb.hidden = true; form.removeAttribute("data-wa"); return null; }
       var url = buildWa(d); linkWa(fwa, url); fwa.setAttribute("data-ready", "1"); form.setAttribute("data-wa", url); err.textContent = ""; fallback(ffb, url); return url;
     }
     var sg = $("[data-slots]", form);
