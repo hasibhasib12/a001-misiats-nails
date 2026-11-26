@@ -21,7 +21,8 @@
   function photoEl(s) {
     var box = el("div", "ph-img");
     var img = document.createElement("img");
-    img.loading = "lazy"; img.decoding = "async"; img.width = 720; img.height = 540;
+    img.loading = "lazy"; img.decoding = "async"; img.width = s.dim ? s.dim[0] : 720; img.height = s.dim ? s.dim[1] : 540;
+    if (s.dim) box.className += " nat";   /* Originalformat, kein Beschnitt */
     if (s.photo) {
       img.sizes = "(max-width:640px) 92vw, 380px";
       img.srcset = base + "photos/" + s.photo + "-720.webp 720w, " + base + "photos/" + s.photo + "-1440.webp 1440w";
@@ -47,6 +48,36 @@
       var row = el("div", "row"); row.appendChild(el("h4", "", sname(s)));
       var pt = priceText(s); row.appendChild(el("b", pt.tbc ? "tbc" : "", pt.t));
       a.appendChild(row); wrap.appendChild(a);
+    });
+  });
+  /* ---------- Pediküre-Karten: Foto (sauber, ohne Text) + Textkarte im Instagram-Stil ---------- */
+  var PC = { de: { cta: "Jetzt Termin sichern!", price: "Preis", loc: "Standort" }, en: { cta: "Book your appointment!", price: "Price", loc: "Location" } };
+  function svgEl(d) { var n = document.createElementNS("http://www.w3.org/2000/svg", "svg"); n.setAttribute("viewBox", "0 0 24 24"); n.setAttribute("aria-hidden", "true"); n.innerHTML = d; return n; }
+  var IC_EUR = '<path d="M15.5 7.2A5.5 5.5 0 0 0 7.6 10M7.6 14a5.5 5.5 0 0 0 7.9 2.8M5.5 10.6h7M5.5 13.4h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>';
+  var IC_PIN = '<path d="M12 20.5s-6-5.6-6-10.2a6 6 0 0 1 12 0c0 4.6-6 10.2-6 10.2z" fill="currentColor"/><circle cx="12" cy="10.2" r="2.3" fill="#fff"/>';
+  $$("[data-pedcards]").forEach(function (wrap) {
+    var loc = wrap.getAttribute("data-pedcards"), L = D.locations[loc], tx = PC[LANG];
+    L.services.pedikuere.forEach(function (s) {
+      if (!s.photo || !s.card) return;
+      var c = s.card, a = el("article", "pcard"); a.style.setProperty("--pc-bg", c.bg); a.style.setProperty("--pc-ac", c.ac);
+      a.setAttribute("aria-label", sname(s) + " – " + L.name);
+      var f = el("figure", "pc-photo"), im = document.createElement("img");
+      im.loading = "lazy"; im.decoding = "async"; im.width = s.dim[0]; im.height = s.dim[1];
+      im.sizes = "(max-width:640px) 92vw, 400px";
+      im.srcset = base + "photos/" + s.photo + "-720.webp 720w, " + base + "photos/" + s.photo + "-1440.webp 1440w";
+      im.src = base + "photos/" + s.photo + "-720.webp"; im.alt = salt(s); f.appendChild(im); a.appendChild(f);
+      var t = el("div", "pc-text");
+      t.appendChild(el("p", "pc-side", c.side[LANG]));
+      t.appendChild(el("p", "pc-h", c.h[LANG]));
+      t.appendChild(el("p", "pc-s", c.s[LANG]));
+      t.appendChild(el("span", "pc-ul"));
+      var pills = el("div", "pc-pills"), p1 = el("p", "pill"), b1 = el("span", "badge"); b1.appendChild(svgEl(IC_EUR)); p1.appendChild(b1);
+      var pt = priceText(s), x1 = el("span", "pl"); x1.appendChild(el("small", "", sname(s))); x1.appendChild(el("b", "", pt.t)); p1.appendChild(x1); pills.appendChild(p1);
+      var p2 = el("p", "pill"), b2 = el("span", "badge"); b2.appendChild(svgEl(IC_PIN)); p2.appendChild(b2);
+      var x2 = el("span", "pl"); x2.appendChild(el("small", "", tx.loc)); x2.appendChild(el("b", "", L.name)); p2.appendChild(x2); pills.appendChild(p2);
+      t.appendChild(pills);
+      var cta = el("a", "pc-cta", tx.cta); cta.href = "kontakt.html?loc=" + loc + "&svc=pedikuere"; cta.setAttribute("data-chat", loc + ":pedikuere");
+      t.appendChild(cta); a.appendChild(t); wrap.appendChild(a);
     });
   });
   $$("[data-addr]").forEach(function (e) { e.textContent = D.locations[e.getAttribute("data-addr")].address; });
