@@ -10,16 +10,16 @@
 window.MN = {
   pricesConfirmed: false,
   whatsapp: "491726127991",
-  /* Wunschuhrzeit-Auswahl (Chat + Formular). Öffnungszeiten noch NICHT bestätigt –
-     hier anpassen: erste/letzte Uhrzeit, Abstand in Minuten, geschlossene Wochentage
+  /* Wunschuhrzeit-Auswahl (Chat + Formular). Öffnungszeiten bestätigt 26.11.2026:
+     Mo–Sa 10:00–20:00, So geschlossen (beide Standorte). Hier anpassen: erste/letzte Uhrzeit, Abstand in Minuten, geschlossene Wochentage
      (0 = Sonntag, 1 = Montag … 6 = Samstag), z. B. closedDays: [0] */
-  booking: { first: "10:00", last: "19:30", stepMin: 30, closedDays: [] },           // +49 172 6127991 (bestätigt 26.11.2026)
+  booking: { first: "10:00", last: "19:30", stepMin: 30, closedDays: [0] },           // +49 172 6127991 (bestätigt 26.11.2026)
   locations: {
     langerfeld: {
       name: "Wuppertal-Langerfeld",
       address: "Spitzenstraße 30, 42389 Wuppertal",
       map: "https://www.google.com/maps/search/?api=1&query=Spitzenstra%C3%9Fe+30%2C+42389+Wuppertal",
-      hours: null,                     // null = "Öffnungszeiten werden noch bestätigt"
+      hours: { de: "Mo–Sa 10:00–20:00, So geschlossen", en: "Mon–Sat 10:00–20:00, Sun closed" },
       services: {
         manikuere: [
           { id: "mani",        name: "Maniküre", en: "Manicure",                  price: 30, photo: "langerfeld-17-blur", alt: "Gepflegte Hände mit rosa Nägeln", alt_en: "Well-groomed hands with pink nails" },
@@ -40,7 +40,7 @@ window.MN = {
       name: "Schwelm",
       address: "Wilhelmstraße 11, 58332 Schwelm",
       map: "https://www.google.com/maps/search/?api=1&query=Wilhelmstra%C3%9Fe+11%2C+58332+Schwelm",
-      hours: null,
+      hours: { de: "Mo–Sa 10:00–20:00, So geschlossen", en: "Mon–Sat 10:00–20:00, Sun closed" },
       services: {
         /* Schwelm: NUR Pediküre – Preise noch offen */
         pedikuere: [

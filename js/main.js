@@ -139,7 +139,7 @@
           done: "Danke, {n}! Ihre Anfrage ist vorbereitet. Tippen Sie unten, um sie per WhatsApp zu senden. Ihr Termin wird persönlich per WhatsApp bestätigt.",
           wa: "Termin per WhatsApp anfragen", note: "Ihr Termin wird persönlich per WhatsApp bestätigt. Es wird nichts gespeichert – bitte keine Gesundheitsdaten angeben.",
           restart: "Neu beginnen", sub: "Assistent · Terminanfrage", mani: "Maniküre", pedi: "Pediküre",
-          pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit", wDate: "Wunschdatum", wTime: "Wunschuhrzeit", timeL: "Wunschuhrzeit", tNote: "Ihr Termin wird persönlich per WhatsApp bestätigt.", flexT: "flexibel", pickTime: "Bitte eine Wunschuhrzeit wählen.", closed: "An diesem Tag ist leider geschlossen – bitte ein anderes Datum wählen.",
+          pickDate: "Bitte ein Datum wählen.", dateL: "Datum", slotL: "Tageszeit", wDate: "Wunschdatum", wTime: "Wunschuhrzeit", timeL: "Wunschuhrzeit", tNote: "Ihr Termin wird persönlich per WhatsApp bestätigt.", flexT: "flexibel", pickTime: "Bitte eine Wunschuhrzeit wählen.", closed: "Sonntags ist geschlossen – bitte einen Tag von Montag bis Samstag wählen.",
           days: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
           choose: "Bitte wählen", first: "Erst Standort und Leistung wählen", fill: "Bitte alle Felder ausfüllen.", sOnly: "In Schwelm nur Pediküre.",
           msg: ["Hallo Misiats Nails, ich möchte gern einen Termin anfragen.", "Standort", "Behandlung", "Wunschtermin", "Name", "flexibel", "Bitte bestätigen Sie mir den Termin per WhatsApp. Danke!"] },
@@ -149,7 +149,7 @@
           done: "Thank you, {n}! Your request is ready. Tap below to send it via WhatsApp. Your appointment will be confirmed personally via WhatsApp.",
           wa: "Request appointment via WhatsApp", note: "Your appointment is confirmed personally via WhatsApp. Nothing is stored – please do not share health information.",
           restart: "Start again", sub: "Assistant · Appointment request", mani: "Manicure", pedi: "Pedicure",
-          pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day", wDate: "Preferred date", wTime: "Preferred time", timeL: "Preferred time", tNote: "Your appointment will be confirmed personally via WhatsApp.", flexT: "flexible", pickTime: "Please choose a preferred time.", closed: "Sorry, we are closed on that day – please choose another date.",
+          pickDate: "Please choose a date.", dateL: "Date", slotL: "Time of day", wDate: "Preferred date", wTime: "Preferred time", timeL: "Preferred time", tNote: "Your appointment will be confirmed personally via WhatsApp.", flexT: "flexible", pickTime: "Please choose a preferred time.", closed: "We are closed on Sundays – please choose a day from Monday to Saturday.",
           days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
           choose: "Please choose", first: "Choose location and service first", fill: "Please fill in all fields.", sOnly: "Pedicure only in Schwelm.",
           msg: ["Hello Misiats Nails, I would like to request an appointment.", "Location", "Treatment", "Preferred date", "Name", "flexible", "Please confirm the appointment via WhatsApp. Thank you!"] }
@@ -245,6 +245,11 @@
       box.appendChild(grid);
       box.appendChild(el("p", "ct-note", t().tNote));
       var fb = el("button", "chip ct-flex", t().flex); fb.type = "button"; box.appendChild(fb);
+      var ce = el("p", "ct-err", t().closed); ce.setAttribute("role", "alert"); ce.hidden = true; box.insertBefore(ce, box.children[2]);
+      di.addEventListener("change", function () {   /* Ruhetag (Sonntag): Uhrzeiten sperren */
+        var c = isClosed(di.value); ce.hidden = !c; di.setAttribute("aria-invalid", String(c));
+        $$(".slot", grid).forEach(function (b) { b.disabled = c; }); fb.disabled = c;
+      });
       cb.appendChild(box); cb.scrollTop = cb.scrollHeight;
       fb.addEventListener("click", function () {
         st.flex = true; st.time = "flex"; st.date = (di.value && !isClosed(di.value)) ? di.value : ""; box.remove();
@@ -266,7 +271,6 @@
     function openChat(preset) { body.classList.add("chat-open"); fab.setAttribute("aria-expanded", "true"); if (preset || !st) start(preset); }
     function closeChat() { body.classList.remove("chat-open"); fab.setAttribute("aria-expanded", "false"); fab.focus(); }
     window.MNcloseChat = closeChat;
-    window.MNopenChat = openChat; window.MNchatOpen = function () { return body.classList.contains("chat-open"); };
     fab.addEventListener("click", function () { body.classList.contains("chat-open") ? closeChat() : openChat(); });
     $(".chat-head .x", panel).addEventListener("click", closeChat);
     restartBtn.addEventListener("click", function () { start(); });
@@ -313,6 +317,13 @@
       inp.type = "radio"; inp.name = "time"; inp.id = id; inp.value = tm; lab.htmlFor = id; sg.appendChild(inp); sg.appendChild(lab);
       inp.addEventListener("change", refresh);
     });
+    function dayCheck() {   /* Ruhetag (Sonntag): Uhrzeiten sperren, Hinweis zeigen */
+      var c = isClosed(di.value); di.setAttribute("aria-invalid", String(c));
+      $$("input[name=time]", form).forEach(function (r) { r.disabled = c; if (c) r.checked = false; });
+      sg.classList.toggle("off", c);
+      if (c) err.textContent = T[LANG].closed; else if (err.textContent === T[LANG].closed) err.textContent = "";
+    }
+    di.addEventListener("change", dayCheck); di.addEventListener("input", dayCheck);
     ["input", "change"].forEach(function (ev) { form.addEventListener(ev, function () { setTimeout(refresh, 0); }); });
     form.addEventListener("change", function (e) { if (e.target.name === "loc" || e.target.name === "svc") refresh(); });
     fwa.addEventListener("click", function (e) {
@@ -328,16 +339,4 @@
     refresh();
   }
 
-  /* ---------- Mobile Schnellaktionsleiste ---------- */
-  var bbar = $(".bbar");
-  if (bbar) {
-    var bChat = $(".bb-chat", bbar), bRoute = $(".bb-route", bbar), bPop = $(".bb-pop", bbar);
-    function popClose() { bPop.hidden = true; bRoute.setAttribute("aria-expanded", "false"); }
-    bChat.addEventListener("click", function (e) { e.stopPropagation(); popClose();
-      if (window.MNchatOpen && window.MNchatOpen()) { if (window.MNcloseChat) window.MNcloseChat(); } else if (window.MNopenChat) window.MNopenChat(); });
-    bRoute.addEventListener("click", function (e) { e.stopPropagation(); var o = bPop.hidden; bPop.hidden = !o; bRoute.setAttribute("aria-expanded", String(o)); if (o && window.MNcloseChat && window.MNchatOpen && window.MNchatOpen()) window.MNcloseChat(); });
-    bPop.addEventListener("click", function (e) { e.stopPropagation(); });
-    document.addEventListener("click", popClose);
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") popClose(); });
-  }
 })();
